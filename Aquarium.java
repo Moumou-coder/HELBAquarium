@@ -1,9 +1,9 @@
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 
-public class Frogger extends JFrame {
+public class Aquarium extends JFrame {
 
-    public Frogger() {
+    public Aquarium() {
         
         initUI();
     }
@@ -15,7 +15,7 @@ public class Frogger extends JFrame {
         setResizable(false);
         pack();
         
-        setTitle("Frogger");
+        setTitle("HELBAquarium");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -24,7 +24,7 @@ public class Frogger extends JFrame {
     public static void main(String[] args) {
         
         EventQueue.invokeLater(() -> {
-            JFrame ex = new Frogger();
+            JFrame ex = new Aquarium();
             ex.setVisible(true);
         });
     }

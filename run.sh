@@ -1,5 +1,5 @@
 #!/bin/bash 
 
-javac Frogger.java
-java Frogger
+javac Aquarium.java
+java Aquarium
 find . -type f -name "*.class" -delete
