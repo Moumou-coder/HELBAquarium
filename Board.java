@@ -17,8 +17,8 @@ import java.util.HashMap;
 
 public class Board extends JPanel implements ActionListener {
 
-    private final int B_WIDTH = 300;
-    private final int B_HEIGHT = 300;
+    private final int B_WIDTH = 500;
+    private final int B_HEIGHT = 500;
     private final int DOT_SIZE = 10;
     private final int RAND_POS = 29;
     private final int DELAY = 140;
@@ -75,7 +75,7 @@ public class Board extends JPanel implements ActionListener {
         //insectImage = iii.getImage();
         fixedGameElementImageMap.put("insect", iii);
 
-        ImageIcon iih = new ImageIcon("head.png");
+        ImageIcon iih = new ImageIcon("./assets/head.png");
         head = iih.getImage();
     }
 
