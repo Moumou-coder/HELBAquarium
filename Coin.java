@@ -1,4 +1,3 @@
-
 public class Coin extends FixedGameElement {
     
     public Coin(int pos_x, int pos_y) {  
@@ -6,7 +5,7 @@ public class Coin extends FixedGameElement {
     }
     
     public static String getPathToImage(){
-        return "coin.png";
+        return "./assets/coin.png";
     }
     
     public String getType(){

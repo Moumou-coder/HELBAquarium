@@ -1,4 +1,3 @@
-
 public class Insect extends FixedGameElement {
 
 
@@ -8,7 +7,7 @@ public class Insect extends FixedGameElement {
     }
     
     public static String getPathToImage(){
-        return "insect.png";
+        return "./assets/insect.png";
     }
     
     public String getType(){
