@@ -1,17 +1,9 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.Timer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,39 +15,41 @@ public class Board extends JPanel implements ActionListener {
     private final int RAND_POS = 29;
     private final int DELAY = 140;
 
+    private boolean inGame = true;
+    private Timer timer;
+
     private int pos_x;
     private int pos_y;
-    
-    private int coinCounter;
+
+    private HashMap<String, ImageIcon> fixedGameElementImageMap;
     private int insectCounter;
-    //private ArrayList<Coin> coinList ;
-    private ArrayList<FixedGameElement> fixedGameElementList ;
-    HashMap<String, ImageIcon> fixedGameElementImageMap ;
+    private int pelletCounter;
+    private int decorationCounter;
+    private ArrayList<FixedGameElement> fixedGameElementList;
 
-    private boolean leftDirection = false;
-    private boolean rightDirection = false;
-    private boolean upDirection = false;
-    private boolean downDirection = false;
-    private boolean inGame = true;
+    private HashMap<String, ImageIcon> movingGameElementImageMap;
+    private int fishCounter;
+    private ArrayList<MovingGameElement> movingGameElementList;
 
-    private Timer timer;
-    private Image ball;
-    private Image coin;
-    private Image head;
-    
+
     private int score;
-    private int void_x = -1*B_WIDTH;
-    private int void_y = -1*B_HEIGHT;
+    private int void_x = -1 * B_WIDTH;
+    private int void_y = -1 * B_HEIGHT;
+
+//    private boolean leftDirection = false;
+//    private boolean rightDirection = false;
+//    private boolean upDirection = false;
+//    private boolean downDirection = false;
 
     public Board() {
-        
+
         initBoard();
     }
-    
+
     private void initBoard() {
 
         addKeyListener(new TAdapter());
-        setBackground(Color.black);
+        setBackground(Color.lightGray);
         setFocusable(true);
 
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
@@ -64,39 +58,59 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void loadImages() {
-    
+
+        //L'image de l'icon pour les éléments fixes du jeu
         fixedGameElementImageMap = new HashMap<String, ImageIcon>();
 
-        ImageIcon iic = new ImageIcon(Coin.getPathToImage());
-        //coinImage = iic.getImage();
-        fixedGameElementImageMap.put("coin", iic);
-        
         ImageIcon iii = new ImageIcon(Insect.getPathToImage());
-        //insectImage = iii.getImage();
         fixedGameElementImageMap.put("insect", iii);
+        ImageIcon iip = new ImageIcon(Pellet.getPathToImage());
+        fixedGameElementImageMap.put("pellet", iip);
+        ImageIcon iid = new ImageIcon(Decoration.getPathToImage());
+        fixedGameElementImageMap.put("decoration", iid);
 
-        ImageIcon iih = new ImageIcon("./assets/head.png");
-        head = iih.getImage();
+
+        //L'image de l'icon pour les éléments en mouvement
+        movingGameElementImageMap = new HashMap<String, ImageIcon>();
+
+        ImageIcon iif = new ImageIcon(Fish.getPathToImage());
+        movingGameElementImageMap.put("fish", iif);
+
     }
 
     private void initGame() {
-        
-        score = 0 ;
-        
-        pos_x = B_WIDTH/2;
-        pos_y = B_HEIGHT/2;
-        
-        coinCounter = 3;
-        insectCounter = 2;
+
+        score = 0;
+
+//        pos_x = B_WIDTH / 2;
+//        pos_y = B_HEIGHT / 2;
+
+        insectCounter = 3;
+        pelletCounter = 3;
+        decorationCounter = 5;
+
+        fishCounter = 10;
+
+        //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
-        
-        for(int i = 0; i < coinCounter ; i++){
-            fixedGameElementList.add(new Coin(getRandomCoordinate(), getRandomCoordinate()));
-        }
-        
-        for(int i = 0; i < insectCounter ; i++){
+
+        for (int i = 0; i < insectCounter; i++) {
             fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate()));
         }
+        for (int i = 0; i < pelletCounter; i++) {
+            fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
+        }
+        for (int i = 0; i < decorationCounter; i++) {
+            fixedGameElementList.add(new Decoration(getRandomCoordinate(), getRandomCoordinate()));
+        }
+
+        //List contenant les poissons
+        movingGameElementList = new ArrayList<MovingGameElement>();
+
+        for (int i = 0; i < fishCounter; i++) {
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate()));
+        }
+
 
         timer = new Timer(DELAY, this);
         timer.start();
@@ -108,27 +122,28 @@ public class Board extends JPanel implements ActionListener {
 
         doDrawing(g);
     }
-    
+
     private void doDrawing(Graphics g) {
-        
+
         if (inGame) {
 
-            for(FixedGameElement elem: fixedGameElementList){               
+            for (FixedGameElement elem : fixedGameElementList) {
                 g.drawImage(fixedGameElementImageMap.get(elem.getType()).getImage(), elem.getPosX(), elem.getPosY(), this);
-            }      
-            
-            g.drawImage(head, pos_x, pos_y, this);
+            }
+            for (MovingGameElement elem : movingGameElementList) {
+                g.drawImage(movingGameElementImageMap.get(elem.getType()).getImage(), elem.getPosX(), elem.getPosY(), this);
+            }
 
             Toolkit.getDefaultToolkit().sync();
 
         } else {
 
             gameOver(g);
-        }        
+        }
     }
 
     private void gameOver(Graphics g) {
-        
+
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
@@ -140,44 +155,44 @@ public class Board extends JPanel implements ActionListener {
 
     private void checkFixedGameElementCollision() {
 
-        for(FixedGameElement elem: fixedGameElementList){
-            if ((pos_x == elem.getPosX()) && (pos_y == elem.getPosY())){
+        for (FixedGameElement elem : fixedGameElementList) {
+            if ((pos_x == elem.getPosX()) && (pos_y == elem.getPosY())) {
                 elem.setPosX(void_x);
                 elem.setPosY(void_y);
-                
+
                 elem.triggerAction(this);
-                
-                System.out.println(coinCounter);
+
+//                System.out.println(coinCounter);
                 System.out.println(score);
             }
-        }    
+        }
     }
-    
-    public void incScore(int valueToIncrease){
+
+    public void incScore(int valueToIncrease) {
         score += valueToIncrease;
-    } 
-    
-    public void decreaseCoinAmount(){
-        coinCounter -=1;
+    }
+
+    public void decreaseCoinAmount() {
+//        coinCounter -= 1;
     }
 
     private void move() {
 
-        if (leftDirection) {
-            pos_x -= DOT_SIZE;
-        }
-
-        if (rightDirection) {
-            pos_x += DOT_SIZE;
-        }
-
-        if (upDirection) {
-            pos_y -= DOT_SIZE;
-        }
-
-        if (downDirection) {
-            pos_y += DOT_SIZE;
-        }
+//        if (leftDirection) {
+//            pos_x -= DOT_SIZE;
+//        }
+//
+//        if (rightDirection) {
+//            pos_x += DOT_SIZE;
+//        }
+//
+//        if (upDirection) {
+//            pos_y -= DOT_SIZE;
+//        }
+//
+//        if (downDirection) {
+//            pos_y += DOT_SIZE;
+//        }
     }
 
     private void checkCollision() {
@@ -197,12 +212,12 @@ public class Board extends JPanel implements ActionListener {
         if (pos_x < 0) {
             inGame = false;
         }
-        
+
         if (!inGame) {
             timer.stop();
         }
     }
-    
+
     private int getRandomCoordinate() {
 
         int r = (int) (Math.random() * RAND_POS);
@@ -228,30 +243,16 @@ public class Board extends JPanel implements ActionListener {
 
             int key = e.getKeyCode();
 
-            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
-                leftDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
+            if(key == KeyEvent.VK_NUMPAD0)
+                setBackground(Color.lightGray);
+            if(key == KeyEvent.VK_NUMPAD1)
+                setBackground(Color.blue);
+            if(key == KeyEvent.VK_NUMPAD2)
+                setBackground(Color.pink);
+            if(key == KeyEvent.VK_NUMPAD3)
+                setBackground(Color.red);
 
-            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
-                rightDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
-                upDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
-                downDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-            move();
+//            move();
         }
     }
 }
