@@ -18,12 +18,12 @@ public abstract class FixedGameElement {
         return pos_y;
     }
     
-    public void setPosX(int new_pos){
-        pos_x = new_pos;
+    public void setPosX(int newPos_x){
+        pos_x = newPos_x;
     }
     
-    public void setPosY(int new_pos){
-        pos_y = new_pos;
+    public void setPosY(int newPos_y){
+        pos_y = newPos_y;
     }
     
     public abstract String getType();
