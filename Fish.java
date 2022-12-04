@@ -1,17 +1,30 @@
 public class Fish extends MovingGameElement {
 
-    public Fish(int pos_x, int pos_y) {
-        super(pos_x, pos_y);
+    private String color;
+    static final String PANEL_COLOR[] = {"blue", "orange", "purple", "red"};
+
+
+    public Fish(int pos_x, int pos_y, int speed, String color) {
+        super(pos_x, pos_y, speed);
+        this.color = color;
     }
 
-    public static String getPathToImage(){
-        return "./assets/redFish.png";
+    public String getPathToImage() {
+        return "./assets/" + this.color + "Fish.png";
     }
 
-    public String getType(){
-        return "fish";
+    public String getColor() {
+        return color;
     }
 
-    public void triggerAction(Board board){
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getType() {
+        return getColor() + "Fish";
+    }
+
+    public void triggerAction(Board board) {
     }
 }

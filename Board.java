@@ -29,17 +29,19 @@ public class Board extends JPanel implements ActionListener {
 
     private HashMap<String, ImageIcon> movingGameElementImageMap;
     private int fishCounter;
+    private int initSpeedFish;
     private ArrayList<MovingGameElement> movingGameElementList;
 
+    private Image head;
 
     private int score;
     private int void_x = -1 * B_WIDTH;
     private int void_y = -1 * B_HEIGHT;
 
-//    private boolean leftDirection = false;
-//    private boolean rightDirection = false;
-//    private boolean upDirection = false;
-//    private boolean downDirection = false;
+    private boolean leftDirection = false;
+    private boolean rightDirection = false;
+    private boolean upDirection = false;
+    private boolean downDirection = false;
 
     public Board() {
 
@@ -61,7 +63,6 @@ public class Board extends JPanel implements ActionListener {
 
         //L'image de l'icon pour les éléments fixes du jeu
         fixedGameElementImageMap = new HashMap<String, ImageIcon>();
-
         ImageIcon iii = new ImageIcon(Insect.getPathToImage());
         fixedGameElementImageMap.put("insect", iii);
         ImageIcon iip = new ImageIcon(Pellet.getPathToImage());
@@ -72,9 +73,13 @@ public class Board extends JPanel implements ActionListener {
 
         //L'image de l'icon pour les éléments en mouvement
         movingGameElementImageMap = new HashMap<String, ImageIcon>();
+        for (int i = 0; i < Fish.PANEL_COLOR.length; i++) {
+            movingGameElementImageMap.put(Fish.PANEL_COLOR[i] + "Fish", new ImageIcon("./assets/" + Fish.PANEL_COLOR[i] + "Fish.png"));
+        }
 
-        ImageIcon iif = new ImageIcon(Fish.getPathToImage());
-        movingGameElementImageMap.put("fish", iif);
+        /* Head */
+        ImageIcon iih = new ImageIcon("./assets/head.png");
+        head = iih.getImage();
 
     }
 
@@ -82,14 +87,14 @@ public class Board extends JPanel implements ActionListener {
 
         score = 0;
 
-//        pos_x = B_WIDTH / 2;
-//        pos_y = B_HEIGHT / 2;
+        pos_x = B_WIDTH / 2;
+        pos_y = B_HEIGHT / 2;
 
-        insectCounter = 3;
-        pelletCounter = 3;
-        decorationCounter = 5;
+        insectCounter = 0;
+        pelletCounter = 0;
+        decorationCounter = 0;
 
-        fishCounter = 10;
+        fishCounter = 0;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -106,9 +111,9 @@ public class Board extends JPanel implements ActionListener {
 
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
-
+        initSpeedFish = 3;
         for (int i = 0; i < fishCounter; i++) {
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate()));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, Fish.PANEL_COLOR[i % 4]));
         }
 
 
@@ -131,8 +136,11 @@ public class Board extends JPanel implements ActionListener {
                 g.drawImage(fixedGameElementImageMap.get(elem.getType()).getImage(), elem.getPosX(), elem.getPosY(), this);
             }
             for (MovingGameElement elem : movingGameElementList) {
-                g.drawImage(movingGameElementImageMap.get(elem.getType()).getImage(), elem.getPosX(), elem.getPosY(), this);
+                g.drawImage(movingGameElementImageMap.get(elem.getType()).getImage(), elem.getPos_x(), elem.getPos_y(), this);
             }
+
+            /* Head */
+            g.drawImage(head, pos_x, pos_y, this);
 
             Toolkit.getDefaultToolkit().sync();
 
@@ -162,7 +170,6 @@ public class Board extends JPanel implements ActionListener {
 
                 elem.triggerAction(this);
 
-//                System.out.println(coinCounter);
                 System.out.println(score);
             }
         }
@@ -172,27 +179,23 @@ public class Board extends JPanel implements ActionListener {
         score += valueToIncrease;
     }
 
-    public void decreaseCoinAmount() {
-//        coinCounter -= 1;
-    }
-
     private void move() {
 
-//        if (leftDirection) {
-//            pos_x -= DOT_SIZE;
-//        }
-//
-//        if (rightDirection) {
-//            pos_x += DOT_SIZE;
-//        }
-//
-//        if (upDirection) {
-//            pos_y -= DOT_SIZE;
-//        }
-//
-//        if (downDirection) {
-//            pos_y += DOT_SIZE;
-//        }
+        if (leftDirection) {
+            pos_x -= DOT_SIZE;
+        }
+
+        if (rightDirection) {
+            pos_x += DOT_SIZE;
+        }
+
+        if (upDirection) {
+            pos_y -= DOT_SIZE;
+        }
+
+        if (downDirection) {
+            pos_y += DOT_SIZE;
+        }
     }
 
     private void checkCollision() {
@@ -228,11 +231,9 @@ public class Board extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         if (inGame) {
-
             checkFixedGameElementCollision();
             checkCollision();
         }
-
         repaint();
     }
 
@@ -243,6 +244,7 @@ public class Board extends JPanel implements ActionListener {
 
             int key = e.getKeyCode();
 
+/* Key event pour update temperature
             if(key == KeyEvent.VK_NUMPAD0)
                 setBackground(Color.lightGray);
             if(key == KeyEvent.VK_NUMPAD1)
@@ -251,8 +253,33 @@ public class Board extends JPanel implements ActionListener {
                 setBackground(Color.pink);
             if(key == KeyEvent.VK_NUMPAD3)
                 setBackground(Color.red);
+*/
 
-//            move();
+            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
+                leftDirection = true;
+                upDirection = false;
+                downDirection = false;
+            }
+
+            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
+                rightDirection = true;
+                upDirection = false;
+                downDirection = false;
+            }
+
+            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
+                upDirection = true;
+                rightDirection = false;
+                leftDirection = false;
+            }
+
+            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
+                downDirection = true;
+                rightDirection = false;
+                leftDirection = false;
+            }
+
+            move();
         }
     }
 }
