@@ -2,26 +2,36 @@ public abstract class MovingGameElement {
 
     private int pos_x;
     private int pos_y;
+    private int speed;
 
-    public MovingGameElement(int pos_x, int pos_y) {
+    public MovingGameElement(int pos_x, int pos_y, int speed) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
+        this.speed = speed;
     }
 
-    public int getPosX(){
+    public int getPos_x() {
         return pos_x;
     }
 
-    public int getPosY(){
+    public void setPos_x(int pos_x) {
+        this.pos_x = pos_x;
+    }
+
+    public int getPos_y() {
         return pos_y;
     }
 
-    public void setPosX(int newPos_x){
-        pos_x = newPos_x;
+    public void setPos_y(int pos_y) {
+        this.pos_y = pos_y;
     }
 
-    public void setPosY(int newPos_y){
-        pos_y = newPos_y;
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public abstract String getType();
