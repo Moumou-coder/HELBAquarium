@@ -15,7 +15,6 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int RAND_POS = 29;
     private final int DELAY = 140;
-    private final String PANEL_COLOR[] = {"blue", "orange", "purple", "red"};
 
     private boolean inGame = true;
     private Timer timer;
@@ -76,11 +75,21 @@ public class Board extends JPanel implements ActionListener {
 
         //L'image de l'icon pour les éléments en mouvement
         movingGameElementImageMap = new HashMap<String, ImageIcon>();
-        for (int i = 0; i < fishCounter; i++) {
-            randElemPanelColor = new Random().nextInt(PANEL_COLOR.length);
+//        ImageIcon iif = new ImageIcon(Fish.getPathToImage());
+//        fixedGameElementImageMap.put("fish", iif);
+
+//        int rand = new Random().nextInt(Fish.PANEL_COLOR.length);
+        for (int i = 0; i < Fish.PANEL_COLOR.length; i++) {
+            movingGameElementImageMap.put("fish"+Fish.PANEL_COLOR[i], new ImageIcon("./assets/" + Fish.PANEL_COLOR[i] + "Fish.png"));
         }
-        ImageIcon iif = new ImageIcon(Fish.getPathToImage(PANEL_COLOR[randElemPanelColor]));
-        movingGameElementImageMap.put("fish", iif);
+
+//        ImageIcon iif = new ImageIcon(Fish.PANEL_COLOR[]);
+//        ImageIcon iif1 = new ImageIcon(Fish.getPathToImage());
+//        ImageIcon iif2 = new ImageIcon(Fish.getPathToImage());
+
+//        for (int i = 0; i < fishCounter; i++) {
+//            randElemPanelColor = new Random().nextInt(PANEL_COLOR.length);
+//        }
 
         /* Head */
         ImageIcon iih = new ImageIcon("./assets/head.png");
@@ -99,7 +108,7 @@ public class Board extends JPanel implements ActionListener {
         pelletCounter = 0;
         decorationCounter = 0;
 
-        fishCounter = 3;
+        fishCounter = 10;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -117,8 +126,9 @@ public class Board extends JPanel implements ActionListener {
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
         initSpeedFish = 3;
+//        randElemPanelColor =  new Random().nextInt(Fish.PANEL_COLOR.length);
         for (int i = 0; i < fishCounter; i++) {
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, Fish.PANEL_COLOR[i%4]));
         }
 
 
