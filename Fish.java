@@ -22,7 +22,7 @@ public class Fish extends MovingGameElement {
     }
 
     public String getType() {
-        return "fish"+getColor();
+        return getColor() + "Fish";
     }
 
     public void triggerAction(Board board) {

@@ -6,7 +6,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -31,7 +30,6 @@ public class Board extends JPanel implements ActionListener {
     private HashMap<String, ImageIcon> movingGameElementImageMap;
     private int fishCounter;
     private int initSpeedFish;
-    private int randElemPanelColor;
     private ArrayList<MovingGameElement> movingGameElementList;
 
     private Image head;
@@ -75,21 +73,9 @@ public class Board extends JPanel implements ActionListener {
 
         //L'image de l'icon pour les éléments en mouvement
         movingGameElementImageMap = new HashMap<String, ImageIcon>();
-//        ImageIcon iif = new ImageIcon(Fish.getPathToImage());
-//        fixedGameElementImageMap.put("fish", iif);
-
-//        int rand = new Random().nextInt(Fish.PANEL_COLOR.length);
         for (int i = 0; i < Fish.PANEL_COLOR.length; i++) {
-            movingGameElementImageMap.put("fish"+Fish.PANEL_COLOR[i], new ImageIcon("./assets/" + Fish.PANEL_COLOR[i] + "Fish.png"));
+            movingGameElementImageMap.put(Fish.PANEL_COLOR[i] + "Fish", new ImageIcon("./assets/" + Fish.PANEL_COLOR[i] + "Fish.png"));
         }
-
-//        ImageIcon iif = new ImageIcon(Fish.PANEL_COLOR[]);
-//        ImageIcon iif1 = new ImageIcon(Fish.getPathToImage());
-//        ImageIcon iif2 = new ImageIcon(Fish.getPathToImage());
-
-//        for (int i = 0; i < fishCounter; i++) {
-//            randElemPanelColor = new Random().nextInt(PANEL_COLOR.length);
-//        }
 
         /* Head */
         ImageIcon iih = new ImageIcon("./assets/head.png");
@@ -108,7 +94,7 @@ public class Board extends JPanel implements ActionListener {
         pelletCounter = 0;
         decorationCounter = 0;
 
-        fishCounter = 10;
+        fishCounter = 0;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -126,9 +112,8 @@ public class Board extends JPanel implements ActionListener {
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
         initSpeedFish = 3;
-//        randElemPanelColor =  new Random().nextInt(Fish.PANEL_COLOR.length);
         for (int i = 0; i < fishCounter; i++) {
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, Fish.PANEL_COLOR[i%4]));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, Fish.PANEL_COLOR[i % 4]));
         }
 
 
