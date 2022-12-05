@@ -19,6 +19,10 @@ public class Insect extends FixedGameElement {
     }
 }
 
+/*todo :
+   Il existe 3 sortes de poissons - weak / medium / strong
+   Same logic que pour les voitures
+ */
 
 
 

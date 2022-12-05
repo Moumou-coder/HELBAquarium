@@ -9,10 +9,6 @@ public class Fish extends MovingGameElement {
         this.color = color;
     }
 
-    public String getPathToImage() {
-        return "./assets/" + this.color + "Fish.png";
-    }
-
     public String getColor() {
         return color;
     }

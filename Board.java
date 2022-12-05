@@ -90,9 +90,9 @@ public class Board extends JPanel implements ActionListener {
         pos_x = B_WIDTH / 2;
         pos_y = B_HEIGHT / 2;
 
-        insectCounter = 0;
+        insectCounter = 2;
         pelletCounter = 0;
-        decorationCounter = 0;
+        decorationCounter = 2;
 
         fishCounter = 0;
 
@@ -164,13 +164,25 @@ public class Board extends JPanel implements ActionListener {
     private void checkFixedGameElementCollision() {
 
         for (FixedGameElement elem : fixedGameElementList) {
-            if ((pos_x == elem.getPosX()) && (pos_y == elem.getPosY())) {
-                elem.setPosX(void_x);
-                elem.setPosY(void_y);
-
-                elem.triggerAction(this);
-
-                System.out.println(score);
+            if ((elem.getClass() == Decoration.class)){
+                if ((pos_x >= elem.getPosX() && pos_x <= elem.getPosX()+2*DOT_SIZE) && (pos_y >= elem.getPosY() && pos_y <= elem.getPosY()+DOT_SIZE)){
+                    System.out.println("blocked");
+//                    elem.triggerAction(this);
+                }
+            }
+            if ((elem.getClass() == Insect.class)){
+                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()){
+                    elem.setPosX(void_x);
+                    elem.setPosY(void_y);
+//                    elem.triggerAction(this);
+                }
+            }
+            if ((elem.getClass() == Pellet.class)){
+                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()){
+                    elem.setPosX(void_x);
+                    elem.setPosY(void_y);
+//                    elem.triggerAction(this);
+                }
             }
         }
     }
@@ -200,19 +212,10 @@ public class Board extends JPanel implements ActionListener {
 
     private void checkCollision() {
 
-        if (pos_y >= B_HEIGHT) {
+        if (pos_y >= B_HEIGHT - head.getHeight(null) || pos_y < 0) {
             inGame = false;
         }
-
-        if (pos_y < 0) {
-            inGame = false;
-        }
-
-        if (pos_x >= B_WIDTH) {
-            inGame = false;
-        }
-
-        if (pos_x < 0) {
+        if (pos_x >= B_WIDTH - head.getWidth(null) || pos_x < 0) {
             inGame = false;
         }
 
