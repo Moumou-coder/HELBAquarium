@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class Board extends JPanel implements ActionListener {
@@ -40,10 +41,14 @@ public class Board extends JPanel implements ActionListener {
     private int void_x = -1 * B_WIDTH;
     private int void_y = -1 * B_HEIGHT;
 
+    private int target_x = 0;
+    private int target_y = 0;
+
     private boolean leftDirection = false;
     private boolean rightDirection = false;
     private boolean upDirection = false;
     private boolean downDirection = false;
+    private boolean isElemCollisionDecoration = false;
 
     public Board() {
 
@@ -93,11 +98,11 @@ public class Board extends JPanel implements ActionListener {
         pos_x = B_WIDTH / 2;
         pos_y = B_HEIGHT / 2;
 
-        insectCounter = 3;
-        pelletCounter = 3;
-        decorationCounter = 3;
+        insectCounter = 0;
+        pelletCounter = 0;
+        decorationCounter = 1;
 
-        fishCounter = 4;
+        fishCounter = 1;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -109,15 +114,16 @@ public class Board extends JPanel implements ActionListener {
             fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
         }
         for (int i = 0; i < decorationCounter; i++) {
-            fixedGameElementList.add(new Decoration(getRandomCoordinate(), getRandomCoordinate()));
+//            fixedGameElementList.add(new Decoration(getRandomCoordinate(), getRandomCoordinate()));
+            fixedGameElementList.add(new Decoration(50, 50));
         }
 
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
         initSpeedFish = 3;
         for (int i = 0; i < fishCounter; i++) {
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
-//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, Fish.PANEL_COLOR[1]));
+//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, PANEL_COLOR[1]));
         }
 
 
@@ -170,6 +176,7 @@ public class Board extends JPanel implements ActionListener {
         for (FixedGameElement elem : fixedGameElementList) {
             if ((elem.getClass() == Decoration.class)){
                 if ((pos_x >= elem.getPosX() && pos_x <= elem.getPosX()+2*DOT_SIZE) && (pos_y >= elem.getPosY() && pos_y <= elem.getPosY()+DOT_SIZE)){
+                    isElemCollisionDecoration = true;
                     System.out.println("blocked");
 //                    elem.triggerAction(this);
                 }
@@ -197,32 +204,37 @@ public class Board extends JPanel implements ActionListener {
 
     private void move() {
 
-        if (leftDirection) {
-            pos_x -= DOT_SIZE;
+        ArrayList<Integer> x_moveOptions = new ArrayList<Integer>() ;
+        ArrayList<Integer> y_moveOptions = new ArrayList<Integer>() ;
+        ArrayList<Double> distances = new ArrayList<Double>() ;
+
+        for (int i = -1 ; i <= 1 ; i++){
+            for (int j = -1 ; j <= 1 ; j++){
+                int test_pos_x = pos_x +i* DOT_SIZE;
+                int test_pos_y = pos_y +j* DOT_SIZE;
+                if (isValidPosition(test_pos_x, test_pos_y)){
+                    x_moveOptions.add(test_pos_x);
+                    y_moveOptions.add(test_pos_y);
+                }
+            }
         }
 
-        if (rightDirection) {
-            pos_x += DOT_SIZE;
+        // pourquoi juste la list x_moveOptions ?
+        for (int i=0; i < x_moveOptions.size() ; i++){
+            Double distance = getDistance(target_x, target_y, x_moveOptions.get(i), y_moveOptions.get(i));
+            distances.add(distance);
         }
 
-        if (upDirection) {
-            pos_y -= DOT_SIZE;
-        }
+        // à quoi sert cette partie ?
+        double min = Collections.min(distances);
+        int min_index = distances.indexOf(min);
 
-        if (downDirection) {
-            pos_y += DOT_SIZE;
-        }
+        pos_x = x_moveOptions.get(min_index);
+        pos_y = y_moveOptions.get(min_index);
     }
 
     private void checkCollision() {
-
-        if (pos_y >= B_HEIGHT - head.getHeight(null) || pos_y < 0) {
-            inGame = false;
-        }
-        if (pos_x >= B_WIDTH - head.getWidth(null) || pos_x < 0) {
-            inGame = false;
-        }
-
+        inGame = isValidPosition(pos_x, pos_y);
         if (!inGame) {
             timer.stop();
         }
@@ -234,13 +246,46 @@ public class Board extends JPanel implements ActionListener {
         return ((r * DOT_SIZE));
     }
 
+    private boolean isValidPosition(int pos_x, int pos_y) {
+
+        boolean res = true ;
+        if (pos_y >= B_HEIGHT) {
+            res = false;
+        }
+
+        if (pos_y < 0) {
+            res = false;
+        }
+
+        if (pos_x >= B_WIDTH) {
+            res = false;
+        }
+
+        if (pos_x < 0) {
+            res = false;
+        }
+        if(isElemCollisionDecoration){
+            System.out.println("this is a decoration - new target");
+        }
+        return res;
+    }
+
+    private double getDistance(int pos_x0, int pos_y0, int pos_x1, int pos_y1){
+        int x_dist = pos_x1-pos_x0;
+        int y_dist = pos_y1-pos_y0;
+        return Math.sqrt(Math.pow(x_dist, 2)+Math.pow(y_dist, 2));
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (inGame) {
             checkFixedGameElementCollision();
             checkCollision();
+            move();
+            System.out.println(pos_x + " --- " + pos_y);
         }
+
         repaint();
     }
 
@@ -287,7 +332,7 @@ public class Board extends JPanel implements ActionListener {
             }
 
             move();
-            System.out.println(PANEL_COLOR.length);
+
         }
     }
 }
