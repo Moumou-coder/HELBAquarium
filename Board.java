@@ -14,6 +14,8 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int RAND_POS = 29;
     private final int DELAY = 140;
+    private final String PANEL_COLOR[] = {"blue", "orange", "purple", "red"};
+    private final String PANEL_POWER[] = {"weak", "medium", "strong"};
 
     private boolean inGame = true;
     private Timer timer;
@@ -63,8 +65,9 @@ public class Board extends JPanel implements ActionListener {
 
         //L'image de l'icon pour les éléments fixes du jeu
         fixedGameElementImageMap = new HashMap<String, ImageIcon>();
-        ImageIcon iii = new ImageIcon(Insect.getPathToImage());
-        fixedGameElementImageMap.put("insect", iii);
+        for (int i = 0; i < PANEL_POWER.length; i++) {
+            fixedGameElementImageMap.put(PANEL_POWER[i] + "Insect", new ImageIcon("./assets/" + PANEL_POWER[i] + "Insect.png"));
+        }
         ImageIcon iip = new ImageIcon(Pellet.getPathToImage());
         fixedGameElementImageMap.put("pellet", iip);
         ImageIcon iid = new ImageIcon(Decoration.getPathToImage());
@@ -73,8 +76,8 @@ public class Board extends JPanel implements ActionListener {
 
         //L'image de l'icon pour les éléments en mouvement
         movingGameElementImageMap = new HashMap<String, ImageIcon>();
-        for (int i = 0; i < Fish.PANEL_COLOR.length; i++) {
-            movingGameElementImageMap.put(Fish.PANEL_COLOR[i] + "Fish", new ImageIcon("./assets/" + Fish.PANEL_COLOR[i] + "Fish.png"));
+        for (int i = 0; i < PANEL_COLOR.length; i++) {
+            movingGameElementImageMap.put(PANEL_COLOR[i] + "Fish", new ImageIcon("./assets/" + PANEL_COLOR[i] + "Fish.png"));
         }
 
         /* Head */
@@ -90,17 +93,17 @@ public class Board extends JPanel implements ActionListener {
         pos_x = B_WIDTH / 2;
         pos_y = B_HEIGHT / 2;
 
-        insectCounter = 0;
-        pelletCounter = 0;
-        decorationCounter = 0;
+        insectCounter = 3;
+        pelletCounter = 3;
+        decorationCounter = 3;
 
-        fishCounter = 0;
+        fishCounter = 4;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
 
         for (int i = 0; i < insectCounter; i++) {
-            fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate()));
+            fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate(), PANEL_POWER[i%PANEL_POWER.length]));
         }
         for (int i = 0; i < pelletCounter; i++) {
             fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
@@ -113,7 +116,8 @@ public class Board extends JPanel implements ActionListener {
         movingGameElementList = new ArrayList<MovingGameElement>();
         initSpeedFish = 3;
         for (int i = 0; i < fishCounter; i++) {
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, Fish.PANEL_COLOR[i % 4]));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
+//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, Fish.PANEL_COLOR[1]));
         }
 
 
@@ -164,13 +168,25 @@ public class Board extends JPanel implements ActionListener {
     private void checkFixedGameElementCollision() {
 
         for (FixedGameElement elem : fixedGameElementList) {
-            if ((pos_x == elem.getPosX()) && (pos_y == elem.getPosY())) {
-                elem.setPosX(void_x);
-                elem.setPosY(void_y);
-
-                elem.triggerAction(this);
-
-                System.out.println(score);
+            if ((elem.getClass() == Decoration.class)){
+                if ((pos_x >= elem.getPosX() && pos_x <= elem.getPosX()+2*DOT_SIZE) && (pos_y >= elem.getPosY() && pos_y <= elem.getPosY()+DOT_SIZE)){
+                    System.out.println("blocked");
+//                    elem.triggerAction(this);
+                }
+            }
+            if ((elem.getClass() == Insect.class)){
+                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()){
+                    elem.setPosX(void_x);
+                    elem.setPosY(void_y);
+//                    elem.triggerAction(this);
+                }
+            }
+            if ((elem.getClass() == Pellet.class)){
+                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()){
+                    elem.setPosX(void_x);
+                    elem.setPosY(void_y);
+//                    elem.triggerAction(this);
+                }
             }
         }
     }
@@ -200,19 +216,10 @@ public class Board extends JPanel implements ActionListener {
 
     private void checkCollision() {
 
-        if (pos_y >= B_HEIGHT) {
+        if (pos_y >= B_HEIGHT - head.getHeight(null) || pos_y < 0) {
             inGame = false;
         }
-
-        if (pos_y < 0) {
-            inGame = false;
-        }
-
-        if (pos_x >= B_WIDTH) {
-            inGame = false;
-        }
-
-        if (pos_x < 0) {
+        if (pos_x >= B_WIDTH - head.getWidth(null) || pos_x < 0) {
             inGame = false;
         }
 
@@ -280,6 +287,7 @@ public class Board extends JPanel implements ActionListener {
             }
 
             move();
+            System.out.println(PANEL_COLOR.length);
         }
     }
 }
