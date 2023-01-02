@@ -108,7 +108,7 @@ public class Board extends JPanel implements ActionListener {
         fixedGameElementList = new ArrayList<FixedGameElement>();
 
         for (int i = 0; i < insectCounter; i++) {
-            fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate(), PANEL_POWER[i%PANEL_POWER.length]));
+            fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate(), PANEL_POWER[i % PANEL_POWER.length]));
         }
         for (int i = 0; i < pelletCounter; i++) {
             fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
@@ -173,29 +173,29 @@ public class Board extends JPanel implements ActionListener {
 
     private void checkFixedGameElementCollision() {
 
-        for (FixedGameElement elem : fixedGameElementList) {
-            if ((elem.getClass() == Decoration.class)){
-                if ((pos_x >= elem.getPosX() && pos_x <= elem.getPosX()+2*DOT_SIZE) && (pos_y >= elem.getPosY() && pos_y <= elem.getPosY()+DOT_SIZE)){
+        /*for (FixedGameElement elem : fixedGameElementList) {
+            if ((elem.getClass() == Decoration.class)) {
+                if ((pos_x >= elem.getPosX() && pos_x <= elem.getPosX() + 2 * DOT_SIZE) && (pos_y >= elem.getPosY() && pos_y <= elem.getPosY() + DOT_SIZE)) {
                     isElemCollisionDecoration = true;
                     System.out.println("blocked");
 //                    elem.triggerAction(this);
                 }
             }
-            if ((elem.getClass() == Insect.class)){
-                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()){
+            if ((elem.getClass() == Insect.class)) {
+                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()) {
                     elem.setPosX(void_x);
                     elem.setPosY(void_y);
 //                    elem.triggerAction(this);
                 }
             }
-            if ((elem.getClass() == Pellet.class)){
-                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()){
+            if ((elem.getClass() == Pellet.class)) {
+                if (pos_x == elem.getPosX() && pos_y == elem.getPosY()) {
                     elem.setPosX(void_x);
                     elem.setPosY(void_y);
 //                    elem.triggerAction(this);
                 }
             }
-        }
+        }*/
     }
 
     public void incScore(int valueToIncrease) {
@@ -204,33 +204,48 @@ public class Board extends JPanel implements ActionListener {
 
     private void move() {
 
-        ArrayList<Integer> x_moveOptions = new ArrayList<Integer>() ;
-        ArrayList<Integer> y_moveOptions = new ArrayList<Integer>() ;
-        ArrayList<Double> distances = new ArrayList<Double>() ;
-
-        for (int i = -1 ; i <= 1 ; i++){
-            for (int j = -1 ; j <= 1 ; j++){
-                int test_pos_x = pos_x +i* DOT_SIZE;
-                int test_pos_y = pos_y +j* DOT_SIZE;
-                if (isValidPosition(test_pos_x, test_pos_y)){
-                    x_moveOptions.add(test_pos_x);
-                    y_moveOptions.add(test_pos_y);
-                }
-            }
+//        ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
+//        ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
+//        ArrayList<Double> distances = new ArrayList<Double>();
+//
+//        for (int i = -1; i <= 1; i++) {
+//            for (int j = -1; j <= 1; j++) {
+//                int test_pos_x = pos_x + i * DOT_SIZE;
+//                int test_pos_y = pos_y + j * DOT_SIZE;
+//                if (isValidPosition(test_pos_x, test_pos_y)) {
+//                    x_moveOptions.add(test_pos_x);
+//                    y_moveOptions.add(test_pos_y);
+//                }
+//            }
+//        }
+//
+//
+//        for (int i = 0; i < x_moveOptions.size(); i++) {
+//            Double distance = getDistance(target_x, target_y, x_moveOptions.get(i), y_moveOptions.get(i));
+//            distances.add(distance);
+//        }
+//
+//
+//        double min = Collections.min(distances);
+//        int min_index = distances.indexOf(min);
+//
+//        pos_x = x_moveOptions.get(min_index);
+//        pos_y = y_moveOptions.get(min_index);
+        if (leftDirection) {
+            pos_x -= DOT_SIZE;
         }
 
-        // pourquoi juste la list x_moveOptions ?
-        for (int i=0; i < x_moveOptions.size() ; i++){
-            Double distance = getDistance(target_x, target_y, x_moveOptions.get(i), y_moveOptions.get(i));
-            distances.add(distance);
+        if (rightDirection) {
+            pos_x += DOT_SIZE;
         }
 
-        // à quoi sert cette partie ?
-        double min = Collections.min(distances);
-        int min_index = distances.indexOf(min);
+        if (upDirection) {
+            pos_y -= DOT_SIZE;
+        }
 
-        pos_x = x_moveOptions.get(min_index);
-        pos_y = y_moveOptions.get(min_index);
+        if (downDirection) {
+            pos_y += DOT_SIZE;
+        }
     }
 
     private void checkCollision() {
@@ -248,7 +263,7 @@ public class Board extends JPanel implements ActionListener {
 
     private boolean isValidPosition(int pos_x, int pos_y) {
 
-        boolean res = true ;
+        boolean res = true;
         if (pos_y >= B_HEIGHT) {
             res = false;
         }
@@ -264,16 +279,42 @@ public class Board extends JPanel implements ActionListener {
         if (pos_x < 0) {
             res = false;
         }
-        if(isElemCollisionDecoration){
+        if (isElemCollisionDecoration) {
             System.out.println("this is a decoration - new target");
         }
         return res;
     }
 
-    private double getDistance(int pos_x0, int pos_y0, int pos_x1, int pos_y1){
-        int x_dist = pos_x1-pos_x0;
-        int y_dist = pos_y1-pos_y0;
-        return Math.sqrt(Math.pow(x_dist, 2)+Math.pow(y_dist, 2));
+    private void getRandomCoordinateSides() {
+        int fourCasesSides = 4;
+        int randomSides = (int) (Math.random() * fourCasesSides);
+        int randomCoordinate = (int) (Math.random() * (B_WIDTH-DOT_SIZE));
+
+        /* Dans le sens des aiguilles d'une montre */
+        switch (randomSides){
+            case (0) :
+                /* le côté HAUT */
+                target_x = randomCoordinate;
+                target_y = B_WIDTH - B_WIDTH;
+            case (1) :
+                /* le côté DROIT */
+                target_x = HEIGHT - DOT_SIZE;
+                target_y = randomCoordinate;
+            case (2) :
+                /* le côté BAS */
+                target_x = randomCoordinate;
+                target_y = B_WIDTH - DOT_SIZE;;
+            case (3) :
+                /* le côté Gauche */
+                target_x = B_HEIGHT - B_HEIGHT;
+                target_y = randomCoordinate;
+        }
+    }
+
+    private double getDistance(int pos_x0, int pos_y0, int pos_x1, int pos_y1) {
+        int x_dist = pos_x1 - pos_x0;
+        int y_dist = pos_y1 - pos_y0;
+        return Math.sqrt(Math.pow(x_dist, 2) + Math.pow(y_dist, 2));
     }
 
     @Override
@@ -282,8 +323,9 @@ public class Board extends JPanel implements ActionListener {
         if (inGame) {
             checkFixedGameElementCollision();
             checkCollision();
-            move();
-            System.out.println(pos_x + " --- " + pos_y);
+//            move();
+//            getRandomCoordinateSides();
+//            System.out.println(pos_x + " --- " + pos_y);
         }
 
         repaint();
@@ -307,6 +349,7 @@ public class Board extends JPanel implements ActionListener {
                 setBackground(Color.red);
 */
 
+/* key event pour bouger manuellement head*/
             if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
                 leftDirection = true;
                 upDirection = false;
