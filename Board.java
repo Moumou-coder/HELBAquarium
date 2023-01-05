@@ -100,9 +100,9 @@ public class Board extends JPanel implements ActionListener {
 
         insectCounter = 0;
         pelletCounter = 0;
-        decorationCounter = 1;
+        decorationCounter = 0;
 
-        fishCounter = 1;
+        fishCounter = 0;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -204,33 +204,35 @@ public class Board extends JPanel implements ActionListener {
 
     private void move() {
 
-//        ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
-//        ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
-//        ArrayList<Double> distances = new ArrayList<Double>();
-//
-//        for (int i = -1; i <= 1; i++) {
-//            for (int j = -1; j <= 1; j++) {
-//                int test_pos_x = pos_x + i * DOT_SIZE;
-//                int test_pos_y = pos_y + j * DOT_SIZE;
-//                if (isValidPosition(test_pos_x, test_pos_y)) {
-//                    x_moveOptions.add(test_pos_x);
-//                    y_moveOptions.add(test_pos_y);
-//                }
-//            }
-//        }
-//
-//
-//        for (int i = 0; i < x_moveOptions.size(); i++) {
-//            Double distance = getDistance(target_x, target_y, x_moveOptions.get(i), y_moveOptions.get(i));
-//            distances.add(distance);
-//        }
-//
-//
-//        double min = Collections.min(distances);
-//        int min_index = distances.indexOf(min);
-//
-//        pos_x = x_moveOptions.get(min_index);
-//        pos_y = y_moveOptions.get(min_index);
+        ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
+        ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
+        ArrayList<Double> distances = new ArrayList<Double>();
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                int test_pos_x = pos_x + i * DOT_SIZE;
+                int test_pos_y = pos_y + j * DOT_SIZE;
+                if (isValidPosition(test_pos_x, test_pos_y)) {
+                    x_moveOptions.add(test_pos_x);
+                    y_moveOptions.add(test_pos_y);
+                }
+            }
+        }
+
+
+        for (int i = 0; i < x_moveOptions.size(); i++) {
+            Double distance = getDistance(target_x, target_y, x_moveOptions.get(i), y_moveOptions.get(i));
+            distances.add(distance);
+        }
+
+
+        double min = Collections.min(distances);
+        int min_index = distances.indexOf(min);
+
+        pos_x = x_moveOptions.get(min_index);
+        pos_y = y_moveOptions.get(min_index);
+
+        /*
         if (leftDirection) {
             pos_x -= DOT_SIZE;
         }
@@ -246,6 +248,7 @@ public class Board extends JPanel implements ActionListener {
         if (downDirection) {
             pos_y += DOT_SIZE;
         }
+         */
     }
 
     private void checkCollision() {
@@ -266,18 +269,22 @@ public class Board extends JPanel implements ActionListener {
         boolean res = true;
         if (pos_y >= B_HEIGHT) {
             res = false;
+            getRandomCoordinateSides();
         }
 
         if (pos_y < 0) {
             res = false;
+            getRandomCoordinateSides();
         }
 
         if (pos_x >= B_WIDTH) {
             res = false;
+            getRandomCoordinateSides();
         }
 
         if (pos_x < 0) {
             res = false;
+            getRandomCoordinateSides();
         }
         if (isElemCollisionDecoration) {
             System.out.println("this is a decoration - new target");
@@ -287,27 +294,33 @@ public class Board extends JPanel implements ActionListener {
 
     private void getRandomCoordinateSides() {
         int fourCasesSides = 4;
-        int randomSides = (int) (Math.random() * fourCasesSides);
-        int randomCoordinate = (int) (Math.random() * (B_WIDTH-DOT_SIZE));
+//        int randomSides = (int) (Math.random() * fourCasesSides);
+        int randomSides = 1;
+
+        int randomCoordinate = (int) (Math.random() * (B_WIDTH));
 
         /* Dans le sens des aiguilles d'une montre */
         switch (randomSides){
             case (0) :
                 /* le côté HAUT */
                 target_x = randomCoordinate;
-                target_y = B_WIDTH - B_WIDTH;
+                target_y = B_HEIGHT - B_HEIGHT;
+                System.out.println("sides haut");
             case (1) :
                 /* le côté DROIT */
-                target_x = HEIGHT - DOT_SIZE;
+                target_x = B_WIDTH - DOT_SIZE;
                 target_y = randomCoordinate;
+                System.out.println("side droit");
             case (2) :
                 /* le côté BAS */
                 target_x = randomCoordinate;
-                target_y = B_WIDTH - DOT_SIZE;;
+                target_y = B_HEIGHT - DOT_SIZE;;
+                System.out.println("side bas");
             case (3) :
                 /* le côté Gauche */
-                target_x = B_HEIGHT - B_HEIGHT;
+                target_x = B_WIDTH - B_WIDTH;
                 target_y = randomCoordinate;
+                System.out.println("side gauche");
         }
     }
 
@@ -323,8 +336,7 @@ public class Board extends JPanel implements ActionListener {
         if (inGame) {
             checkFixedGameElementCollision();
             checkCollision();
-//            move();
-//            getRandomCoordinateSides();
+            move();
 //            System.out.println(pos_x + " --- " + pos_y);
         }
 
@@ -349,7 +361,7 @@ public class Board extends JPanel implements ActionListener {
                 setBackground(Color.red);
 */
 
-/* key event pour bouger manuellement head*/
+/* key event pour bouger manuellement head
             if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
                 leftDirection = true;
                 upDirection = false;
@@ -373,6 +385,8 @@ public class Board extends JPanel implements ActionListener {
                 rightDirection = false;
                 leftDirection = false;
             }
+
+ */
 
             move();
 
