@@ -1,0 +1,12 @@
+Projet Java Q3 :  HelbAquarium 
+
+Fonctionnalité : 
++ Afficher tous les objets dans le board en utilisant le polymorphisme : Done
++
+
+Difficultés rencontrés lors du développement de ce projet : 
+* Faire bouger un seul poisson avec la méthode move() dans le board. Ce fut la partie la plus compliqué car je n'avais que des erreurs.
+* Le comportement du poisson orange 
+
+Limitations :
+- Utiliser 2 classes abstraites pour les objets nous bloque à certains moments dans le code comme avec la méthode checkFixedGameElementCollision
