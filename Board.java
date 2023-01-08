@@ -31,9 +31,6 @@ public class Board extends JPanel implements ActionListener {
     private int fishCounter;
     private int initSpeedFish;
     private ArrayList<MovingGameElement> movingGameElementList;
-    private ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
-    private ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
-    private ArrayList<Double> distances = new ArrayList<Double>();
     private int target_x = 5;
     private int target_y = 5;
 
@@ -107,8 +104,7 @@ public class Board extends JPanel implements ActionListener {
         initSpeedFish = 3;
         for (int i = 0; i < fishCounter; i++) {
 //            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
-//            movingGameElementList.add(new Fish(getRandomCoordinateX(), getRandomCoordinateY(), initSpeedFish, PANEL_COLOR[1]));
-            movingGameElementList.add(new Fish(B_WIDTH/2, B_HEIGHT/2, initSpeedFish, PANEL_COLOR[1]));
+            movingGameElementList.add(new Fish(getRandomCoordinateX(), getRandomCoordinateY(), initSpeedFish, PANEL_COLOR[1]));
         }
 
         timer = new Timer(DELAY, this);
@@ -181,6 +177,10 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void move() {
+        ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
+        ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
+        ArrayList<Double> distances = new ArrayList<Double>();
+
         for (MovingGameElement movingElem : movingGameElementList) {
             if (movingElem.getType().equals("orangeFish")) {
                 for (int i = -1; i <= 1; i++) {
