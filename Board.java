@@ -31,14 +31,16 @@ public class Board extends JPanel implements ActionListener {
     private int fishCounter;
     private int initSpeedFish;
     private ArrayList<MovingGameElement> movingGameElementList;
+    private ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
+    private ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
+    private ArrayList<Double> distances = new ArrayList<Double>();
+    private int target_x = 5;
+    private int target_y = 5;
 
     private int score;
 
     private int void_x = -1 * B_WIDTH;
     private int void_y = -1 * B_HEIGHT;
-
-    private int target_x = 0;
-    private int target_y = 0;
 
     private boolean leftDirection = false;
     private boolean rightDirection = false;
@@ -105,7 +107,8 @@ public class Board extends JPanel implements ActionListener {
         initSpeedFish = 3;
         for (int i = 0; i < fishCounter; i++) {
 //            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
-            movingGameElementList.add(new Fish(getRandomCoordinateX(), getRandomCoordinateY(), initSpeedFish, PANEL_COLOR[1]));
+//            movingGameElementList.add(new Fish(getRandomCoordinateX(), getRandomCoordinateY(), initSpeedFish, PANEL_COLOR[1]));
+            movingGameElementList.add(new Fish(B_WIDTH/2, B_HEIGHT/2, initSpeedFish, PANEL_COLOR[1]));
         }
 
         timer = new Timer(DELAY, this);
@@ -131,11 +134,11 @@ public class Board extends JPanel implements ActionListener {
             Toolkit.getDefaultToolkit().sync();
 
         } else {
-//            gameOver(g);
+            gameOver(g);
         }
     }
 
-   private void gameOver(Graphics g) {
+    private void gameOver(Graphics g) {
 
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
@@ -178,44 +181,39 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void move() {
-        ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
-        ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
-        ArrayList<Double> distances = new ArrayList<Double>();
-
-        for (MovingGameElement elem : movingGameElementList) {
-            if (elem.getType() == "orangeFish"){
+        for (MovingGameElement movingElem : movingGameElementList) {
+            if (movingElem.getType().equals("orangeFish")) {
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
-                        int test_pos_x = elem.getPos_x() + i * DOT_SIZE;
-                        int test_pos_y = elem.getPos_y() + j * DOT_SIZE;
+                        int test_pos_x = movingElem.getPos_x() + i * DOT_SIZE;
+                        int test_pos_y = movingElem.getPos_y() + j * DOT_SIZE;
                         if (isValidPosition(test_pos_x, test_pos_y)) {
                             x_moveOptions.add(test_pos_x);
                             y_moveOptions.add(test_pos_y);
                         }
                     }
                 }
+
+                for (int i = 0; i < x_moveOptions.size(); i++) {
+                    Double distance = getDistance(target_x, target_y, x_moveOptions.get(i), y_moveOptions.get(i));
+                    distances.add(distance);
+                }
+
+                double min = Collections.min(distances);
+                int min_index = distances.indexOf(min);
+
+                if (min_index < x_moveOptions.size()) {
+                    movingElem.setPos_x(x_moveOptions.get(min_index));
+                    movingElem.setPos_y(y_moveOptions.get(min_index));
+                }
             }
         }
-
-        for (int i = 0; i < x_moveOptions.size(); i++) {
-            Double distance = getDistance(target_x, target_y, x_moveOptions.get(i), y_moveOptions.get(i));
-            distances.add(distance);
-        }
-
-        double min = Collections.min(distances);
-        int min_index = distances.indexOf(min);
-
-        for (MovingGameElement elem : movingGameElementList) {
-            if (elem.getType() == "colorFish"){
-                elem.setPos_x(x_moveOptions.get(min_index));
-                elem.setPos_y(y_moveOptions.get(min_index));
-            }
-        }
-
     }
 
     private void checkCollision() {
-//        inGame = isValidPosition(pos_x, pos_y);
+        for(MovingGameElement mvElem : movingGameElementList){
+            inGame = isValidPosition(mvElem.getPos_x(), mvElem.getPos_y());
+        }
         if (!inGame) {
             timer.stop();
         }
@@ -232,23 +230,26 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private boolean isValidPosition(int pos_x, int pos_y) {
-        boolean res = true;
+        boolean isPositionValid = true;
+
+        if (isElemCollisionDecoration) {
+            System.out.println("this is a decoration - new target");
+        }
+
         if (pos_y >= B_HEIGHT) {
-            res = false;
+            isPositionValid = false;
         }
         if (pos_y < 0) {
-            res = false;
+            isPositionValid = false;
         }
         if (pos_x >= B_WIDTH) {
-            res = false;
+            isPositionValid = false;
         }
         if (pos_x < 0) {
-            res = false;
+            isPositionValid = false;
         }
-//        if (isElemCollisionDecoration) {
-//            System.out.println("this is a decoration - new target");
-//        }
-        return res;
+
+        return isPositionValid;
     }
 
 //    private void getRandomCoordinateSides() {
@@ -316,8 +317,6 @@ public class Board extends JPanel implements ActionListener {
             if(key == KeyEvent.VK_NUMPAD3)
                 setBackground(Color.red);
 */
-            move();
-
         }
     }
 }
