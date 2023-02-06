@@ -28,8 +28,6 @@ public abstract class FixedGameElement {
     
     public abstract String getType();
     
-    public abstract void triggerAction(Board board);
-    
 }
 
 

@@ -1,6 +1,7 @@
 public class Insect extends FixedGameElement {
 
     private String power;
+    private int durationSpeed = 0;
 
     public Insect(int pos_x, int pos_y, String power) {
         super(pos_x, pos_y);
@@ -19,8 +20,11 @@ public class Insect extends FixedGameElement {
         return getPower() + "Insect";
     }
     
-    public void triggerAction(Board board){
-        board.incScore(2);
+    public int triggerAction(){
+        if(getPower().equals("weak")) durationSpeed = 5000;
+        if(getPower().equals("medium")) durationSpeed = 10000;
+        if(getPower().equals("strong")) durationSpeed = 15000;
+        return durationSpeed;
     }
 }
 

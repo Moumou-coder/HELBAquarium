@@ -7,7 +7,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Random;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -21,6 +20,7 @@ public class Board extends JPanel implements ActionListener {
 
     private boolean inGame = true;
     private Timer timer;
+    private Timer timerSpeed;
 
     private HashMap<String, ImageIcon> fixedGameElementImageMap;
     private int insectCounter;
@@ -31,7 +31,9 @@ public class Board extends JPanel implements ActionListener {
     private HashMap<String, ImageIcon> movingGameElementImageMap;
     private int fishCounter;
     private int initSpeedFish;
+    private int speedFishIncreased;
     private ArrayList<MovingGameElement> movingGameElementList;
+
 
     private int score;
 
@@ -78,11 +80,11 @@ public class Board extends JPanel implements ActionListener {
     private void initGame() {
         score = 0;
 
-        insectCounter = 0;
+        insectCounter = 40;
         pelletCounter = 0;
         decorationCounter = 0;
 
-        fishCounter = 8;
+        fishCounter = 1;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -98,10 +100,12 @@ public class Board extends JPanel implements ActionListener {
 
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
-        initSpeedFish = 1;
+        initSpeedFish = 5;
+        speedFishIncreased = initSpeedFish * 2;
         for (int i = 0; i < fishCounter; i++) {
 //            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), getArrayTarget()[0], getArrayTarget()[1], initSpeedFish, PANEL_COLOR[1]));
+            int[] randTarget = getArrayTarget();
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[1]));
         }
 
         timer = new Timer(DELAY, this);
@@ -142,97 +146,40 @@ public class Board extends JPanel implements ActionListener {
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
     }
 
-
-   /* private void checkFixedGameElementCollision() {
-        for (FixedGameElement elem : fixedGameElementList) {
+    private void checkFixedGameElementCollision() {
+        for (FixedGameElement fxElem : fixedGameElementList) {
             for (MovingGameElement mvElem : movingGameElementList) {
-                if ((elem.getClass() == Decoration.class)) {
-                    if ((mvElem.getPos_x() >= elem.getPosX() && mvElem.getPos_x() <= elem.getPosX() + 2 * DOT_SIZE) && (mvElem.getPos_y() >= elem.getPosY() && mvElem.getPos_y() <= elem.getPosY() + DOT_SIZE)) {
-                        isElemCollisionDecoration = true;
-                    }
-                }
-                if ((elem.getClass() == Insect.class)) {
-                    if (mvElem.getPos_x() == elem.getPosX() && mvElem.getPos_y() == elem.getPosY()) {
-                        elem.setPosX(void_x);
-                        elem.setPosY(void_y);
-//                    elem.triggerAction(this);
-                    }
-                }
-                if ((elem.getClass() == Pellet.class)) {
-                    if (mvElem.getPos_x() == elem.getPosX() && mvElem.getPos_y() == elem.getPosY()) {
-                        elem.setPosX(void_x);
-                        elem.setPosY(void_y);
-//                    elem.triggerAction(this);
+                if ((mvElem.getPos_x() >= fxElem.getPosX() - (DOT_SIZE / 2) && mvElem.getPos_x() <= fxElem.getPosX() + (DOT_SIZE / 2)) && (mvElem.getPos_y() >= fxElem.getPosY() - (DOT_SIZE / 2) && mvElem.getPos_y() <= fxElem.getPosY() + (DOT_SIZE / 2))) {
+                    fxElem.setPosX(void_x);
+                    fxElem.setPosY(void_y);
+                    if(fxElem.getClass() == Insect.class){
+                        Timer timer = new Timer(((Insect) fxElem).triggerAction(), actionEvent -> {
+                            Timer timerSpeed = (Timer) actionEvent.getSource();
+                            timerSpeed.stop();
+                            mvElem.setSpeed(initSpeedFish);
+
+                        });
+                        timer.start();
+                        mvElem.setSpeed(speedFishIncreased);
+
                     }
                 }
             }
         }
-    }*/
+    }
 
     public void incScore(int valueToIncrease) {
         score += valueToIncrease;
     }
 
-    private int getRandomCoordinate(){
-        return (int)(Math.random()*(B_WIDTH-DOT_SIZE));
+    private int getRandomCoordinate() {
+        return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
     }
 
-    /* TODO: Déplacer toute la méthode move dans le classe fish - responsabilité des class */
     private void move() {
-
-
-        for (MovingGameElement movingElem : movingGameElementList) {
-
-            ArrayList<Integer> x_moveOptions = new ArrayList<Integer>();
-            ArrayList<Integer> y_moveOptions = new ArrayList<Integer>();
-            ArrayList<Double> distances = new ArrayList<Double>();
-
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    int test_pos_x = movingElem.getPos_x() + i * DOT_SIZE;
-                    int test_pos_y = movingElem.getPos_y() + j * DOT_SIZE;
-                    if (isValidPosition(movingElem, test_pos_x, test_pos_y)) {
-                        x_moveOptions.add(test_pos_x);
-                        y_moveOptions.add(test_pos_y);
-                    }
-                }
-            }
-
-            for (int i = 0; i < x_moveOptions.size(); i++) {
-                Double distance = getDistance(movingElem.getTarget_x(), movingElem.getTarget_y(), x_moveOptions.get(i), y_moveOptions.get(i));
-                distances.add(distance);
-            }
-
-            double min = Collections.min(distances);
-            int min_index = distances.indexOf(min);
-
-//            if (min_index < x_moveOptions.size()) {
-                movingElem.setPos_x(x_moveOptions.get(min_index));
-                movingElem.setPos_y(y_moveOptions.get(min_index));
-//            }
-
+        for (MovingGameElement mvElem : movingGameElementList) {
+            mvElem.move(this);
         }
-    }
-
-    private boolean isValidPosition(MovingGameElement mvElem, int pos_x, int pos_y) {
-        boolean isPositionValid = true;
-
-        if (pos_y < 0 || pos_y >= B_HEIGHT) {
-            isPositionValid = false;
-            changeTargets(mvElem);
-        }
-        if (pos_x < 0 || pos_x >= B_WIDTH) {
-            isPositionValid = false;
-            changeTargets(mvElem);
-        }
-
-        return isPositionValid;
-    }
-
-    private double getDistance(int pos_x0, int pos_y0, int pos_x1, int pos_y1) {
-        int x_dist = pos_x1 - pos_x0;
-        int y_dist = pos_y1 - pos_y0;
-        return Math.sqrt(Math.pow(x_dist, 2) + Math.pow(y_dist, 2));
     }
 
     private void changeTargets(MovingGameElement mvElem) {
@@ -241,26 +188,39 @@ public class Board extends JPanel implements ActionListener {
         mvElem.setTarget_y(randTarget[1]);
     }
 
-    private int[] getArrayTarget(){
-        int randPos = getRandomCoordinate();
-        int[][] tabPos = {{randPos, 0}, {500, randPos}, {randPos, 500}, {0, randPos}};
+    public boolean isValidPosition(MovingGameElement movElem, int pos_x, int pos_y) {
+        boolean isPositionValid = true;
+        if (pos_y < 0 || pos_y >= B_HEIGHT) {
+            isPositionValid = false;
+            changeTargets(movElem);
+        }
+        if (pos_x < 0 || pos_x >= B_WIDTH) {
+            isPositionValid = false;
+            changeTargets(movElem);
+        }
+
+       for (FixedGameElement fxElem : fixedGameElementList) {
+           if (fxElem.getClass() == Decoration.class) {
+               if ((pos_x >= fxElem.getPosX() && pos_x <= fxElem.getPosX() + 3 * DOT_SIZE) && (pos_y >= fxElem.getPosY() && pos_y <= fxElem.getPosY() + 2 * DOT_SIZE)) {
+                   System.out.println("element touche");
+                   isPositionValid = false;
+                   changeTargets(movElem);
+               }
+           }
+       }
+
+        return isPositionValid;
+    }
+    private int[] getArrayTarget() {
+//        int randPos = getRandomCoordinate();
+        int[][] tabPos = {{getRandomCoordinate(), 0}, {500, getRandomCoordinate()}, {getRandomCoordinate(), 500}, {0, getRandomCoordinate()}};
         return tabPos[(int) (Math.random() * tabPos.length)];
     }
-
-//    private void checkCollision() {
-//        for (MovingGameElement mvElem : movingGameElementList) {
-//            inGame = isValidPosition(mvElem, mvElem.getPos_x(), mvElem.getPos_y());
-//        }
-//        if (!inGame) {
-//            timer.stop();
-//        }
-//    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (inGame) {
-//            checkFixedGameElementCollision();
-//            checkCollision();
+            checkFixedGameElementCollision();
             move();
         }
         repaint();

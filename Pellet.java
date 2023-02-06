@@ -12,9 +12,6 @@ public class Pellet extends FixedGameElement {
         return "pellet";
     }
 
-    public void triggerAction(Board board){
-    }
-
 }
 
 
