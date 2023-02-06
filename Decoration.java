@@ -12,7 +12,4 @@ public class Decoration extends FixedGameElement {
     public String getType() {
         return "decoration";
     }
-
-    public void triggerAction(Board board) {
-    }
 }

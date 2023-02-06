@@ -10,3 +10,33 @@ Difficultés rencontrés lors du développement de ce projet :
 
 Limitations :
 - Utiliser 2 classes abstraites pour les objets nous bloque à certains moments dans le code comme avec la méthode checkFixedGameElementCollision
+
+
+Codes :
+
+Ancien checkCollision :
+//    private void checkCollision() {
+//        for (MovingGameElement mvElem : movingGameElementList) {
+//            inGame = isValidPosition(mvElem, mvElem.getPos_x(), mvElem.getPos_y());
+//        }
+//        if (!inGame) {
+//            timer.stop();
+//        }
+//    }
+
+checkFixedGameElementCollision(){
+if ((elem.getClass() == Insect.class)) {
+                    if (mvElem.getPos_x() == elem.getPosX() && mvElem.getPos_y() == elem.getPosY()) {
+                        elem.setPosX(void_x);
+                        elem.setPosY(void_y);
+//                    elem.triggerAction(this);
+                    }
+                }
+                if ((elem.getClass() == Pellet.class)) {
+                    if (mvElem.getPos_x() == elem.getPosX() && mvElem.getPos_y() == elem.getPosY()) {
+                        elem.setPosX(void_x);
+                        elem.setPosY(void_y);
+//                    elem.triggerAction(this);
+                    }
+                }
+}
