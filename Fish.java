@@ -52,6 +52,7 @@ public class Fish extends MovingGameElement {
         setPos_y(getY_moveOptions().get(min_index));
     }
 
+
     public double getDistance(int pos_x0, int pos_y0, int pos_x1, int pos_y1) {
         int x_dist = pos_x1 - pos_x0;
         int y_dist = pos_y1 - pos_y0;
@@ -61,4 +62,5 @@ public class Fish extends MovingGameElement {
     public void triggerAction(Board board) {
 
     }
+
 }
