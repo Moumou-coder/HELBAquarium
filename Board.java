@@ -32,7 +32,7 @@ public class Board extends JPanel implements ActionListener {
     private int fishCounter;
     private int initSpeedFish;
     private int speedFishIncreased;
-    private ArrayList<MovingGameElement> movingGameElementList;
+    public ArrayList<MovingGameElement> movingGameElementList;
 
 
     private int score;
@@ -178,16 +178,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void followTargetFish() {
-        for (MovingGameElement mvElem : movingGameElementList) {
-            if (mvElem.getType().equals("redFish") ) {
-                Double distance = 156465151.8;
-                for (MovingGameElement mvElemOther : movingGameElementList) {
-                    if(!mvElemOther.getType().equals("redFish")){
 
-                    }
-                }
-            }
-        }
     }
 
     public void incScore(int valueToIncrease) {
