@@ -84,7 +84,7 @@ public class Board extends JPanel implements ActionListener {
         pelletCounter = 0;
         decorationCounter = 0;
 
-        fishCounter = 20;
+        fishCounter = 10;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -105,7 +105,7 @@ public class Board extends JPanel implements ActionListener {
         for (int i = 0; i < fishCounter; i++) {
             int[] randTarget = getArrayTarget();
 //            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[3]));
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[(int) (Math.random()*PANEL_COLOR.length)]));
         }
 
         timer = new Timer(DELAY, this);
@@ -146,6 +146,7 @@ public class Board extends JPanel implements ActionListener {
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
     }
 
+    /* todo: fusionner les deux méthodes checkCollision */
     private void checkFixedGameElementCollision() {
         for (FixedGameElement fxElem : fixedGameElementList) {
             for (MovingGameElement mvElem : movingGameElementList) {
@@ -177,13 +178,9 @@ public class Board extends JPanel implements ActionListener {
         });
     }
 
-    private void followTargetFish() {
-
-    }
-
-    public void incScore(int valueToIncrease) {
-        score += valueToIncrease;
-    }
+//    public void incScore(int valueToIncrease) {
+//        score += valueToIncrease;
+//    }
 
     private int getRandomCoordinate() {
         return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
@@ -195,19 +192,26 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+    /* todo: changer nom méthode et variable plus logique */
     private void changeTargets(MovingGameElement mvElem) {
         int[] randTarget = getArrayTarget();
         mvElem.setTarget_x(randTarget[0]);
         mvElem.setTarget_y(randTarget[1]);
     }
 
+    private int[] getArrayTarget() {
+        int randPos = getRandomCoordinate();
+        int[][] tabPos = {{randPos, 0}, {500, randPos}, {randPos, 500}, {0, randPos}};
+        return tabPos[(int) (Math.random() * tabPos.length)];
+    }
+
     public boolean isValidPosition(MovingGameElement movElem, int pos_x, int pos_y) {
         boolean isPositionValid = true;
-        if (pos_y < 0 || pos_y >= B_HEIGHT) {
+        if (pos_y < 0 || pos_y >= (B_HEIGHT-DOT_SIZE)) {
             isPositionValid = false;
             changeTargets(movElem);
         }
-        if (pos_x < 0 || pos_x >= B_WIDTH) {
+        if (pos_x < 0 || pos_x >= (B_WIDTH-DOT_SIZE)) {
             isPositionValid = false;
             changeTargets(movElem);
         }
@@ -223,12 +227,6 @@ public class Board extends JPanel implements ActionListener {
         }
 
         return isPositionValid;
-    }
-
-    private int[] getArrayTarget() {
-        int randPos = getRandomCoordinate();
-        int[][] tabPos = {{randPos, 0}, {500, randPos}, {randPos, 500}, {0, randPos}};
-        return tabPos[(int) (Math.random() * tabPos.length)];
     }
 
     @Override
