@@ -15,7 +15,8 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     //    private final int RAND_POS = 29;
     private final int DELAY = 140;
-    private final String PANEL_COLOR[] = {"blue", "orange", "purple", "red"};
+    private final String PANEL_COLOR[] = {"orange","red", "orange","blue", "purple" };
+//    private final String PANEL_COLOR[] = {"red"};
     private final String PANEL_POWER[] = {"weak", "medium", "strong"};
 
     private boolean inGame = true;
@@ -82,9 +83,9 @@ public class Board extends JPanel implements ActionListener {
 
         insectCounter = 0;
         pelletCounter = 0;
-        decorationCounter = 0;
+        decorationCounter = 3;
 
-        fishCounter = 10;
+        fishCounter = 3;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -100,12 +101,12 @@ public class Board extends JPanel implements ActionListener {
 
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
-        initSpeedFish = 5;
+        initSpeedFish = 15;
         speedFishIncreased = initSpeedFish * 2;
         for (int i = 0; i < fishCounter; i++) {
             int[] randTarget = getArrayTarget();
-//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[3]));
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[(int) (Math.random()*PANEL_COLOR.length)]));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[i%PANEL_COLOR.length]));
+//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[(int) (Math.random()*PANEL_COLOR.length)]));
         }
 
         timer = new Timer(DELAY, this);
@@ -193,7 +194,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     /* todo: changer nom méthode et variable plus logique */
-    private void changeTargets(MovingGameElement mvElem) {
+    public void changeTargets(MovingGameElement mvElem) {
         int[] randTarget = getArrayTarget();
         mvElem.setTarget_x(randTarget[0]);
         mvElem.setTarget_y(randTarget[1]);
