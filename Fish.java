@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Predicate;
 
 public class Fish extends MovingGameElement {
     private String color;
-    private int min_index;
+    private int index;
     private final double RANGE_DISTANCE = 100;
-    private int count = 0;
 
     public Fish(int pos_x, int pos_y, int target_x, int target_y, int speed, String color) {
         super(pos_x, pos_y, target_x, target_y, speed);
@@ -33,11 +33,10 @@ public class Fish extends MovingGameElement {
 
         calculPossibilities(board, getX_moveOptions(), getY_moveOptions());
         calculDistance(getDistances(), getX_moveOptions(), getY_moveOptions(), getTarget_x(), getTarget_y());
+        index = getDistances().indexOf(Collections.min(getDistances()));
 
         if (getType().equals("orangeFish")) {
-            min_index = getDistances().indexOf(Collections.min(getDistances()));
-            setPos_x(getX_moveOptions().get(min_index));
-            setPos_y(getY_moveOptions().get(min_index));
+            setPositions();
             return; //afin d'éviter de rentrer dans le for pour les autres poissons
         }
 
@@ -48,129 +47,34 @@ public class Fish extends MovingGameElement {
             ArrayList<Double> tempoDistance = new ArrayList<Double>();
 
             if (getType().equals("redFish") && !mvElemOther.getType().equals("redFish")) {
-
-                calculPossibilities(board, tempoX, tempoY);
-                calculDistance(tempoDistance, tempoX, tempoY, mvElemOther.getPos_x(), mvElemOther.getPos_y());
-
-                if (Collections.min(tempoDistance) < RANGE_DISTANCE && Collections.min(tempoDistance) < Collections.min(getDistances())) {
-                    System.out.println("coco ");
-                    setDistances(tempoDistance);
-                    setX_moveOptions(tempoX);
-                    setY_moveOptions(tempoY);
-                }
+                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false );
+            }
+            if (getType().equals("blueFish")  && this != mvElemOther && (mvElemOther.getType().equals("blueFish") || mvElemOther.getType().equals("purpleFish"))) {
+                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false);
+            }
+            if (getType().equals("purpleFish") && mvElemOther.getType().equals("redFish")) {
+                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, true);
             }
         }
+        setPositions();
+    }
 
-        min_index = getDistances().indexOf(Collections.min(getDistances()));
-        setPos_x(getX_moveOptions().get(min_index));
-        setPos_y(getY_moveOptions().get(min_index));
+    private void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, boolean isMax) {
+        calculPossibilities(board, tempoX, tempoY);
+        calculDistance(tempoDistance, tempoX, tempoY, mvElemOther.getPos_x(), mvElemOther.getPos_y());
 
-//        if(getType().equals("blueFish")){
-//            for (MovingGameElement mvElemOther : board.movingGameElementList) {
-//                if (mvElemOther != this && mvElemOther.getType().equals("blueFish") || mvElemOther.getType().equals("purpleFish") ) {
-//                    System.out.println("salut");
-//                    ArrayList<Integer> tempoX = new ArrayList<Integer>();
-//                    ArrayList<Integer> tempoY = new ArrayList<Integer>();
-//                    ArrayList<Double> tempoDistance = new ArrayList<Double>();
-//
-//                    for (int i = -1; i <= 1; i++) {
-//                        for (int j = -1; j <= 1; j++) {
-//                            int test_pos_x = getPos_x() + i * getSpeed();
-//                            int test_pos_y = getPos_y() + j * getSpeed();
-//                            tempoX.add(test_pos_x);
-//                            tempoY.add(test_pos_y);
-//
-//                        }
-//                    }
-//                    System.out.println(tempoX);
-//                    for (int i = 0; i < tempoX.size(); i++) {
-//                        Double distance = getDistance(mvElemOther.getPos_x(), mvElemOther.getPos_y(), tempoX.get(i), tempoY.get(i));
-//                        tempoDistance.add(distance);
-//                    }
-//                    if (getDistances() == null || getDistances().isEmpty()) {
-//                        setDistances(tempoDistance);
-//                        setX_moveOptions(tempoX);
-//                        setY_moveOptions(tempoY);
-//
-//                    }
-//
-//
-//
-//                    if ((getDistances() != null || !getDistances().isEmpty())) {
-//                        if (Collections.min(tempoDistance) < Collections.min(getDistances())) {
-//                            setDistances(tempoDistance);
-//                            setX_moveOptions(tempoX);
-//                            setY_moveOptions(tempoY);
-//                        }
-//                    }
-//
-//                    double min = Collections.min(getDistances());
-//                    min_index = getDistances().indexOf(min);
-//                }
-//
-//            }
-//        }
-//        else if(getType().equals("purpleFish")){
-//            for (MovingGameElement mvElemOther : board.movingGameElementList) {
-//                if (mvElemOther != this && mvElemOther.getType().equals("redFish")) {
-//
-//                    ArrayList<Integer> tempoX = new ArrayList<Integer>();
-//                    ArrayList<Integer> tempoY = new ArrayList<Integer>();
-//                    ArrayList<Double> tempoDistance = new ArrayList<Double>();
-//
-//                    for (int i = -1; i <= 1; i++) {
-//                        for (int j = -1; j <= 1; j++) {
-//                            int test_pos_x = getPos_x() + i * getSpeed();
-//                            int test_pos_y = getPos_y() + j * getSpeed();
-//                            if (board.isValidPosition(this, test_pos_x, test_pos_y)) {
-//                                tempoX.add(test_pos_x);
-//                                tempoY.add(test_pos_y);
-//
-//                            }
-//
-//                        }
-//                    }
-//
-//                    for (int i = 0; i < tempoX.size(); i++) {
-//                        Double distance = getDistance(mvElemOther.getPos_x(), mvElemOther.getPos_y(), tempoX.get(i), tempoY.get(i));
-//                        tempoDistance.add(distance);
-//                    }
-//
-//
-//                    if (getDistances() == null || getDistances().isEmpty()) {
-//                        setDistances(tempoDistance);
-//                        setX_moveOptions(tempoX);
-//                        setY_moveOptions(tempoY);
-//                    }
-//
-//                    if ((getDistances() != null || !getDistances().isEmpty())) {
-//                        if(Collections.min(tempoDistance)  < RANGE_DISTANCE){
-//                            if (Collections.max(tempoDistance) < Collections.max(getDistances())) {
-//                                setDistances(tempoDistance);
-//                                setX_moveOptions(tempoX);
-//                                setY_moveOptions(tempoY);
-//                            }
-//                            double max = Collections.max(getDistances());
-//                            min_index = getDistances().indexOf(max);
-//                        }
-//                        else{
-//                            tempoDistance.clear();
-//
-//                            for (int i = 0; i < getX_moveOptions().size(); i++) {
-//                                Double distance = getDistance(getTarget_x(), getTarget_y(), getX_moveOptions().get(i), getY_moveOptions().get(i));
-//                                tempoDistance.add(distance);
-//                            }
-//                            setDistances(tempoDistance);
-//                            setX_moveOptions(tempoX);
-//                            setY_moveOptions(tempoY);
-//
-//                            double min = Collections.min(getDistances());
-//                            min_index = getDistances().indexOf(min);
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        boolean replace = isMax ? Collections.max(tempoDistance) < Collections.max(getDistances()) :  Collections.min(tempoDistance) < Collections.min(getDistances());
+        if (Collections.min(tempoDistance) < RANGE_DISTANCE && replace) {
+            setDistances(tempoDistance);
+            setX_moveOptions(tempoX);
+            setY_moveOptions(tempoY);
+            index = isMax ? getDistances().indexOf(Collections.max(getDistances())):getDistances().indexOf(Collections.min(getDistances()));
+        }
+    }
+
+    private void setPositions() {
+        setPos_x(getX_moveOptions().get(index));
+        setPos_y(getY_moveOptions().get(index));
     }
 
     public double getDistance(int pos_x0, int pos_y0, int pos_x1, int pos_y1) {
@@ -203,143 +107,3 @@ public class Fish extends MovingGameElement {
     public void triggerAction(Board board) {
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*public void move(Board board) {
-        super.setX_moveOptions(new ArrayList<Integer>());
-        super.setY_moveOptions(new ArrayList<Integer>());
-        super.setDistances(new ArrayList<Double>());
-
-        for (MovingGameElement mvElemOther : board.movingGameElementList) {
-            ArrayList<Integer> tempoX = new ArrayList<Integer>();
-            ArrayList<Integer> tempoY = new ArrayList<Integer>();
-            ArrayList<Double> tempoDistance = new ArrayList<Double>();
-
-            calculDistanceWithPositions(board, mvElemOther, tempoX, tempoY, tempoDistance);
-            verifyIfDistanceEmpty(tempoX, tempoY, tempoDistance);
-
-
-            if (getType().equals("redFish")) {
-                if (!mvElemOther.getType().equals("redFish")) {
-                    if (!getDistances().isEmpty()) {
-                        if (Collections.min(tempoDistance) < Collections.min(getDistances())) {
-                            setDistances(tempoDistance);
-                            setX_moveOptions(tempoX);
-                            setY_moveOptions(tempoY);
-                        }
-                    }
-                    double min = Collections.min(getDistances());
-                    min_index = getDistances().indexOf(min);
-                }
-            }
-            else if (getType().equals("blueFish")) {
-                if (mvElemOther != this && mvElemOther.getType().equals("blueFish") || mvElemOther.getType().equals("purpleFish")) {
-                    if (!getDistances().isEmpty()) {
-                        if (Collections.min(tempoDistance) < Collections.min(getDistances())) {
-                            setDistances(tempoDistance);
-                            setX_moveOptions(tempoX);
-                            setY_moveOptions(tempoY);
-                        }
-                    }
-                    double min = Collections.min(getDistances());
-                    min_index = getDistances().indexOf(min);
-                }
-            }
-            else if (getType().equals("purpleFish")) {
-                if (mvElemOther != this && mvElemOther.getType().equals("blueFish") || mvElemOther.getType().equals("purpleFish")) {
-                    if (!getDistances().isEmpty()) {
-                        if (Collections.min(tempoDistance) < RANGE_DISTANCE) {
-                            if (Collections.max(tempoDistance) < Collections.max(getDistances())) {
-                                setDistances(tempoDistance);
-                                setX_moveOptions(tempoX);
-                                setY_moveOptions(tempoY);
-                            }
-                            double max = Collections.max(getDistances());
-                            min_index = getDistances().indexOf(max);
-                        } else {
-                            tempoDistance.clear();
-
-                            for (int i = 0; i < getX_moveOptions().size(); i++) {
-                                Double distance = getDistance(getTarget_x(), getTarget_y(), getX_moveOptions().get(i), getY_moveOptions().get(i));
-                                tempoDistance.add(distance);
-                            }
-                            setDistances(tempoDistance);
-                            setX_moveOptions(tempoX);
-                            setY_moveOptions(tempoY);
-
-                            double min = Collections.min(getDistances());
-                            min_index = getDistances().indexOf(min);
-                        }
-                    }
-
-                }
-            }
-            else {
-                for (int i = -1; i <= 1; i++) {
-                    for (int j = -1; j <= 1; j++) {
-                        int test_pos_x = getPos_x() + i * getSpeed();
-                        int test_pos_y = getPos_y() + j * getSpeed();
-                        if (board.isValidPosition(this, test_pos_x, test_pos_y)) {
-                            getX_moveOptions().add(test_pos_x);
-                            getY_moveOptions().add(test_pos_y);
-                        }
-                    }
-                }
-
-                for (int i = 0; i < getX_moveOptions().size(); i++) {
-                    Double distance = getDistance(getTarget_x(), getTarget_y(), getX_moveOptions().get(i), getY_moveOptions().get(i));
-                    getDistances().add(distance);
-                }
-
-                double min = Collections.min(getDistances());
-                min_index = getDistances().indexOf(min);
-            }
-        }
-        setPositionsFromArrays();
-    }
-
-
-    private void verifyIfDistanceEmpty(ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance) {
-        if (getDistances().isEmpty()) {
-            setX_moveOptions(tempoX);
-            setY_moveOptions(tempoY);
-            setDistances(tempoDistance);
-        }
-    }
-
-    private void setPositionsFromArrays() {
-        setPos_x(getX_moveOptions().get(min_index));
-        setPos_y(getY_moveOptions().get(min_index));
-    }
-
-    private void calculDistanceWithPositions(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance) {
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                int test_pos_x = getPos_x() + i * getSpeed();
-                int test_pos_y = getPos_y() + j * getSpeed();
-                if (board.isValidPosition(this, test_pos_x, test_pos_y)) {
-                    tempoX.add(test_pos_x);
-                    tempoY.add(test_pos_y);
-                }
-            }
-        }
-
-        for (int i = 0; i < tempoX.size(); i++) {
-            Double distance = getDistance(mvElemOther.getPos_x(), mvElemOther.getPos_y(), tempoX.get(i), tempoY.get(i));
-            tempoDistance.add(distance);
-        }
-    }
-     */

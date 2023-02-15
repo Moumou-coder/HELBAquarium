@@ -10,13 +10,16 @@ import java.util.stream.Collectors;
 
 public class Board extends JPanel implements ActionListener {
 
-    private final int B_WIDTH = 500;
-    private final int B_HEIGHT = 500;
+    private final int B_WIDTH = 800;
+    private final int B_HEIGHT = 800;
     private final int DOT_SIZE = 10;
     //    private final int RAND_POS = 29;
     private final int DELAY = 140;
-    private final String PANEL_COLOR[] = {"orange","red", "orange","blue", "purple" };
+        private final String PANEL_COLOR[] = {"orange","red","blue", "purple" };
 //    private final String PANEL_COLOR[] = {"red"};
+//    private final String PANEL_COLOR[] = {"purple", "purple", "red"};
+//    private final String PANEL_COLOR[] = {"purple"};
+//    private final String PANEL_COLOR[] = {"blue"};
     private final String PANEL_POWER[] = {"weak", "medium", "strong"};
 
     private boolean inGame = true;
@@ -34,7 +37,6 @@ public class Board extends JPanel implements ActionListener {
     private int initSpeedFish;
     private int speedFishIncreased;
     public ArrayList<MovingGameElement> movingGameElementList;
-
 
     private int score;
 
@@ -83,9 +85,9 @@ public class Board extends JPanel implements ActionListener {
 
         insectCounter = 0;
         pelletCounter = 0;
-        decorationCounter = 3;
+        decorationCounter = 0;
 
-        fishCounter = 3;
+        fishCounter = 4;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -101,11 +103,11 @@ public class Board extends JPanel implements ActionListener {
 
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
-        initSpeedFish = 15;
+        initSpeedFish = 7;
         speedFishIncreased = initSpeedFish * 2;
         for (int i = 0; i < fishCounter; i++) {
             int[] randTarget = getArrayTarget();
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[i%PANEL_COLOR.length]));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
 //            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[(int) (Math.random()*PANEL_COLOR.length)]));
         }
 
@@ -202,17 +204,17 @@ public class Board extends JPanel implements ActionListener {
 
     private int[] getArrayTarget() {
         int randPos = getRandomCoordinate();
-        int[][] tabPos = {{randPos, 0}, {500, randPos}, {randPos, 500}, {0, randPos}};
+        int[][] tabPos = {{randPos, (B_HEIGHT-B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH-B_HEIGHT), randPos}};
         return tabPos[(int) (Math.random() * tabPos.length)];
     }
 
     public boolean isValidPosition(MovingGameElement movElem, int pos_x, int pos_y) {
         boolean isPositionValid = true;
-        if (pos_y < 0 || pos_y >= (B_HEIGHT-DOT_SIZE)) {
+        if (pos_y < 0 || pos_y >= (B_HEIGHT - DOT_SIZE)) {
             isPositionValid = false;
             changeTargets(movElem);
         }
-        if (pos_x < 0 || pos_x >= (B_WIDTH-DOT_SIZE)) {
+        if (pos_x < 0 || pos_x >= (B_WIDTH - DOT_SIZE)) {
             isPositionValid = false;
             changeTargets(movElem);
         }
