@@ -5,7 +5,8 @@ import java.util.function.Predicate;
 public class Fish extends MovingGameElement {
     private String color;
     private int index;
-    private final double RANGE_DISTANCE = 100;
+    private final int SHORT_RANGE_DISTANCE = 50;
+    private final int LONG_RANGE_DISTANCE = 100;
 
     public Fish(int pos_x, int pos_y, int target_x, int target_y, int speed, String color) {
         super(pos_x, pos_y, target_x, target_y, speed);
@@ -47,24 +48,28 @@ public class Fish extends MovingGameElement {
             ArrayList<Double> tempoDistance = new ArrayList<Double>();
 
             if (getType().equals("redFish") && !mvElemOther.getType().equals("redFish")) {
-                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false );
+                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false, LONG_RANGE_DISTANCE );
             }
             if (getType().equals("blueFish")  && this != mvElemOther && (mvElemOther.getType().equals("blueFish") || mvElemOther.getType().equals("purpleFish"))) {
-                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false);
+                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false, SHORT_RANGE_DISTANCE);
             }
             if (getType().equals("purpleFish") && mvElemOther.getType().equals("redFish")) {
-                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, true);
+                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, true, LONG_RANGE_DISTANCE);
             }
         }
         setPositions();
     }
 
-    private void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, boolean isMax) {
+    private void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, boolean isMax, int range) {
+//        int min = -60;
+//        int max = 60;
+//        int range = max - min + 1;
+//        int randomNumber = (int)(Math.random() * range) + min;
         calculPossibilities(board, tempoX, tempoY);
         calculDistance(tempoDistance, tempoX, tempoY, mvElemOther.getPos_x(), mvElemOther.getPos_y());
 
         boolean replace = isMax ? Collections.max(tempoDistance) < Collections.max(getDistances()) :  Collections.min(tempoDistance) < Collections.min(getDistances());
-        if (Collections.min(tempoDistance) < RANGE_DISTANCE && replace) {
+        if (Collections.min(tempoDistance) < range && replace) {
             setDistances(tempoDistance);
             setX_moveOptions(tempoX);
             setY_moveOptions(tempoY);
