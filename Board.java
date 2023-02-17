@@ -6,16 +6,17 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Board extends JPanel implements ActionListener {
 
-    private final int B_WIDTH = 800;
-    private final int B_HEIGHT = 800;
+    private final int B_WIDTH = 500;
+    private final int B_HEIGHT = 500;
     private final int DOT_SIZE = 10;
     //    private final int RAND_POS = 29;
     private final int DELAY = 140;
-        private final String PANEL_COLOR[] = {"orange","red","blue", "purple" };
+            private final String PANEL_COLOR[] = {"orange","red","blue", "purple" };
 //    private final String PANEL_COLOR[] = {"red"};
 //    private final String PANEL_COLOR[] = {"purple", "purple", "red"};
 //    private final String PANEL_COLOR[] = {"purple"};
@@ -83,11 +84,11 @@ public class Board extends JPanel implements ActionListener {
     private void initGame() {
         score = 0;
 
-        insectCounter = 0;
-        pelletCounter = 0;
-        decorationCounter = 0;
+        insectCounter = 5;
+        pelletCounter = 5;
+        decorationCounter = 3;
 
-        fishCounter = 4;
+        fishCounter = 10;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -107,8 +108,8 @@ public class Board extends JPanel implements ActionListener {
         speedFishIncreased = initSpeedFish * 2;
         for (int i = 0; i < fishCounter; i++) {
             int[] randTarget = getArrayTarget();
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
-//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[(int) (Math.random()*PANEL_COLOR.length)]));
+//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[(int) (Math.random()*PANEL_COLOR.length)]));
         }
 
         timer = new Timer(DELAY, this);
@@ -154,9 +155,10 @@ public class Board extends JPanel implements ActionListener {
         for (FixedGameElement fxElem : fixedGameElementList) {
             for (MovingGameElement mvElem : movingGameElementList) {
                 if ((mvElem.getPos_x() >= fxElem.getPosX() - (DOT_SIZE / 2) && mvElem.getPos_x() <= fxElem.getPosX() + (DOT_SIZE / 2)) && (mvElem.getPos_y() >= fxElem.getPosY() - (DOT_SIZE / 2) && mvElem.getPos_y() <= fxElem.getPosY() + (DOT_SIZE / 2))) {
-                    fxElem.setPosX(void_x);
-                    fxElem.setPosY(void_y);
                     if (fxElem.getClass() == Insect.class) {
+                        fxElem.setPosX(void_x);
+                        fxElem.setPosY(void_y);
+
                         Timer timer = new Timer(((Insect) fxElem).triggerAction(), actionEvent -> {
                             Timer timerSpeed = (Timer) actionEvent.getSource();
                             timerSpeed.stop();
@@ -173,6 +175,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void checkFishCollision() {
+        checkReproduction();
         ArrayList<MovingGameElement> redFishes = (ArrayList<MovingGameElement>) movingGameElementList.stream().filter(fish -> fish.getType().equals("redFish")).collect(Collectors.toList());
 
         movingGameElementList.removeIf(fishOther -> {
@@ -202,9 +205,32 @@ public class Board extends JPanel implements ActionListener {
         mvElem.setTarget_y(randTarget[1]);
     }
 
+    public void checkReproduction() {
+        int count = 0;
+        ArrayList<MovingGameElement> copylist = new ArrayList<>(movingGameElementList);
+
+        for (MovingGameElement mvElem1 : copylist) {
+            for (MovingGameElement mvElem2 : copylist) {
+                if ((Objects.equals(mvElem1.getType(), mvElem2.getType())) &&
+                        (mvElem1 != mvElem2) &&
+                        (mvElem2.getPos_x() >= mvElem1.getPos_x() - (DOT_SIZE / 2) && mvElem2.getPos_x() <= mvElem1.getPos_x() + (DOT_SIZE / 2)) && (mvElem2.getPos_y() >= mvElem1.getPos_y() - (DOT_SIZE / 2) && mvElem2.getPos_y() <= mvElem1.getPos_y() + (DOT_SIZE / 2))) {
+                    movingGameElementList.remove(mvElem1);
+                    movingGameElementList.remove(mvElem2);
+                    count++;
+                    if (count % 2 == 0) {
+                        for (int i = 0; i < 3; i++) {
+                            int[] randTarget = getArrayTarget();
+                            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish,mvElem1.getType().substring(0, mvElem2.getType().length() - 4)));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private int[] getArrayTarget() {
         int randPos = getRandomCoordinate();
-        int[][] tabPos = {{randPos, (B_HEIGHT-B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH-B_HEIGHT), randPos}};
+        int[][] tabPos = {{randPos, (B_HEIGHT - B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH - B_HEIGHT), randPos}};
         return tabPos[(int) (Math.random() * tabPos.length)];
     }
 
@@ -222,7 +248,6 @@ public class Board extends JPanel implements ActionListener {
         for (FixedGameElement fxElem : fixedGameElementList) {
             if (fxElem.getClass() == Decoration.class) {
                 if ((pos_x >= fxElem.getPosX() && pos_x <= fxElem.getPosX() + 3 * DOT_SIZE) && (pos_y >= fxElem.getPosY() && pos_y <= fxElem.getPosY() + 2 * DOT_SIZE)) {
-                    System.out.println("element touche");
                     isPositionValid = false;
                     changeTargets(movElem);
                 }
