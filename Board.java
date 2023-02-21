@@ -11,14 +11,14 @@ import java.util.stream.Collectors;
 
 public class Board extends JPanel implements ActionListener {
 
-    private final int B_WIDTH = 500;
-    private final int B_HEIGHT = 500;
+    private final int B_WIDTH = 800;
+    private final int B_HEIGHT = 800;
     private final int DOT_SIZE = 10;
     //    private final int RAND_POS = 29;
     private final int DELAY = 140;
-            private final String PANEL_COLOR[] = {"orange","red","blue", "purple" };
-//    private final String PANEL_COLOR[] = {"red"};
-//    private final String PANEL_COLOR[] = {"purple", "purple", "red"};
+    private final String PANEL_COLOR[] = {"orange", "red", "blue", "purple"};
+    //    private final String PANEL_COLOR[] = {"red"};
+    //    private final String PANEL_COLOR[] = {"purple", "purple", "red"};
 //    private final String PANEL_COLOR[] = {"purple"};
 //    private final String PANEL_COLOR[] = {"blue"};
     private final String PANEL_POWER[] = {"weak", "medium", "strong"};
@@ -28,6 +28,7 @@ public class Board extends JPanel implements ActionListener {
     private Timer timerSpeed;
 
     private HashMap<String, ImageIcon> fixedGameElementImageMap;
+    /* todo : au niveau bonne pratique, puis-je l'initier dans le initGame comme me propose IDE */
     private int insectCounter;
     private int pelletCounter;
     private int decorationCounter;
@@ -86,7 +87,7 @@ public class Board extends JPanel implements ActionListener {
 
         insectCounter = 5;
         pelletCounter = 5;
-        decorationCounter = 3;
+        decorationCounter = (int) (Math.random() * 6) + 1;
 
         fishCounter = 10;
 
@@ -104,17 +105,28 @@ public class Board extends JPanel implements ActionListener {
 
         //List contenant les poissons
         movingGameElementList = new ArrayList<MovingGameElement>();
-        initSpeedFish = 7;
-        speedFishIncreased = initSpeedFish * 2;
+        ;
+        speedFishIncreased = 14;
+        String colorChoice;
         for (int i = 0; i < fishCounter; i++) {
             int[] randTarget = getArrayTarget();
-//            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[i % PANEL_COLOR.length]));
-            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, PANEL_COLOR[(int) (Math.random()*PANEL_COLOR.length)]));
+            colorChoice = PANEL_COLOR[(int) (Math.random() * PANEL_COLOR.length)];
+            initSpeedFish = colorChoice.equals("blue") ? 10 : 7;
+            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, colorChoice));
         }
+
+        /* todo : Demander au prof si c'est ça qu'il veut par rapport au poisson mauve - decoration */
+        checkQuantityOfDecorations();
+
 
         timer = new Timer(DELAY, this);
         timer.start();
     }
+
+    private void checkQuantityOfDecorations() {
+        movingGameElementList.stream().filter(fish -> fish.getType().equals("purpleFish")).forEach(fish -> fish.setSpeed(initSpeedFish + decorationCounter));
+    }
+
 
     @Override
     public void paintComponent(Graphics g) {
@@ -169,6 +181,21 @@ public class Board extends JPanel implements ActionListener {
                         mvElem.setSpeed(speedFishIncreased);
 
                     }
+                    if (fxElem.getClass() == Pellet.class) {
+                        fxElem.setPosX(void_x);
+                        fxElem.setPosY(void_y);
+
+                        int delay = 10000;
+                        ArrayList<MovingGameElement> otherFishes = (ArrayList<MovingGameElement>) movingGameElementList.stream().filter(fish -> !fish.getType().equals(mvElem.getType())).collect(Collectors.toList());
+                        var timer = new Timer(delay, e -> {
+                            Timer timerSpeed = (Timer) e.getSource();
+                            timerSpeed.stop();
+                            otherFishes.forEach(fish -> fish.setSpeed(initSpeedFish));
+                        });
+
+                        timer.start();
+                        otherFishes.forEach(fish -> fish.setSpeed(0));
+                    }
                 }
             }
         }
@@ -184,10 +211,6 @@ public class Board extends JPanel implements ActionListener {
         });
     }
 
-//    public void incScore(int valueToIncrease) {
-//        score += valueToIncrease;
-//    }
-
     private int getRandomCoordinate() {
         return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
     }
@@ -195,6 +218,7 @@ public class Board extends JPanel implements ActionListener {
     private void move() {
         for (MovingGameElement mvElem : movingGameElementList) {
             mvElem.move(this);
+            System.out.println("speed => " + mvElem.getSpeed());
         }
     }
 
@@ -220,7 +244,7 @@ public class Board extends JPanel implements ActionListener {
                     if (count % 2 == 0) {
                         for (int i = 0; i < 3; i++) {
                             int[] randTarget = getArrayTarget();
-                            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish,mvElem1.getType().substring(0, mvElem2.getType().length() - 4)));
+                            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, mvElem1.getType().substring(0, mvElem2.getType().length() - 4)));
                         }
                     }
                 }
@@ -257,11 +281,18 @@ public class Board extends JPanel implements ActionListener {
         return isPositionValid;
     }
 
+    private void checkTemperature() {
+        movingGameElementList.stream()
+                .filter(fish -> fish.getType().equals("redFish"))
+                .forEach(fish -> fish.setSpeed(getBackground() == Color.cyan ? (initSpeedFish - 3) : (getBackground() == Color.pink ? (initSpeedFish + 3) : (initSpeedFish))));
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (inGame) {
             checkFixedGameElementCollision();
             checkFishCollision();
+            checkTemperature();
             move();
         }
         repaint();
@@ -275,13 +306,14 @@ public class Board extends JPanel implements ActionListener {
 
             // Key event pour update temperature //
             if (key == KeyEvent.VK_NUMPAD0)
-                setBackground(Color.lightGray);
+                System.out.println("reset");
             if (key == KeyEvent.VK_NUMPAD1)
-                setBackground(Color.blue);
+                setBackground(Color.cyan);
             if (key == KeyEvent.VK_NUMPAD2)
-                setBackground(Color.pink);
+                setBackground(Color.lightGray);
             if (key == KeyEvent.VK_NUMPAD3)
-                setBackground(Color.red);
+                setBackground(Color.pink);
+
 
         }
     }
