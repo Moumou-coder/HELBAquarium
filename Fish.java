@@ -61,6 +61,8 @@ public class Fish extends MovingGameElement {
     }
 
     private void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, boolean isMax, int range) {
+        /* todo : demander au prof comment le poisson bleu doit se comporter car lorsqu'un blue fish rencontre un autre, il reste sur la meme position car distance la plus courte */
+        /* todo : voir avec le prof si ok range pour les rouges ? */
 //        int min = -60;
 //        int max = 60;
 //        int range = max - min + 1;
