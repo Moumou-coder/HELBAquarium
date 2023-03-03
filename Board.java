@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -89,17 +90,16 @@ public class Board extends JPanel implements ActionListener {
         for (int i = 0; i < fishCounter; i++) {
             colorChoice = Fish.getPANEL_COLOR()[(int) (Math.random() * Fish.getPANEL_COLOR().length)];
             initSpeedFish = 7;
-//            int[] randTarget = getArrayTarget();
-            int randTarget = getRandomCoordinate();
+            int[] randTarget = getArrayTarget();
             Fish fish = null;
             if(colorChoice.equals("Orange"))
-                fish = new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), randTarget, randTarget, initSpeedFish);
+                fish = new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
             if(colorChoice.equals("Blue"))
-                fish = new BlueFish(getRandomCoordinate(), getRandomCoordinate(), randTarget, randTarget, initSpeedFish);
+                fish = new BlueFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
             if(colorChoice.equals("Purple"))
-                fish = new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), randTarget, randTarget, initSpeedFish);
+                fish = new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
             if(colorChoice.equals("Red"))
-                fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), randTarget, randTarget, initSpeedFish);
+                fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
 
             movingGameElementList.add(fish);
         }
@@ -196,28 +196,28 @@ public class Board extends JPanel implements ActionListener {
         return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
     }
 
-//    private void move() {
-//        for (MovingGameElement mvElem : movingGameElementList) {
-////            mvElem.move(this);
-//        }
-//    }
+    private void move() {
+        for (MovingGameElement mvElem : movingGameElementList) {
+            mvElem.move(this);
+        }
+    }
 
     /* todo: changer nom méthode et variable plus logique */
-//    public void changeTargets(MovingGameElement mvElem) {
-//        int[] randTarget = getArrayTarget();
-//        mvElem.setTarget_x(randTarget[0]);
-//        mvElem.setTarget_y(randTarget[1]);
-//    }
+    public void changeTargets(MovingGameElement mvElem) {
+        int[] randTarget = getArrayTarget();
+        mvElem.setTarget_x(randTarget[0]);
+        mvElem.setTarget_y(randTarget[1]);
+    }
 
     /* todo : limiter la reproduction des poissosn en fonction du nombres de poissons */
     public void checkReproduction() {
-        System.out.println("mode reproduction");
+//        System.out.println("mode reproduction");
 //        int count = 0;
 //        ArrayList<MovingGameElement> copylist = new ArrayList<>(movingGameElementList);
 //
 //        for (MovingGameElement mvElem1 : copylist) {
 //            for (MovingGameElement mvElem2 : copylist) {
-//                if ((Objects.equals(mvElem1.getType(), mvElem2.getType())) &&
+//                if ((Objects.equals(mvElem1.getClass().getSimpleName(), mvElem2.getClass().getSimpleName())) &&
 //                        (mvElem1 != mvElem2) &&
 //                        (mvElem2.getPos_x() >= mvElem1.getPos_x() - (DOT_SIZE / 2) && mvElem2.getPos_x() <= mvElem1.getPos_x() + (DOT_SIZE / 2)) && (mvElem2.getPos_y() >= mvElem1.getPos_y() - (DOT_SIZE / 2) && mvElem2.getPos_y() <= mvElem1.getPos_y() + (DOT_SIZE / 2))) {
 //                    movingGameElementList.remove(mvElem1);
@@ -234,34 +234,34 @@ public class Board extends JPanel implements ActionListener {
 //        }
     }
 
-//    private int[] getArrayTarget() {
-//        int randPos = getRandomCoordinate();
-//        int[][] tabPos = {{randPos, (B_HEIGHT - B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH - B_HEIGHT), randPos}};
-//        return tabPos[(int) (Math.random() * tabPos.length)];
-//    }
+    private int[] getArrayTarget() {
+        int randPos = getRandomCoordinate();
+        int[][] tabPos = {{randPos, (B_HEIGHT - B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH - B_HEIGHT), randPos}};
+        return tabPos[(int) (Math.random() * tabPos.length)];
+    }
 
-//    public boolean isValidPosition(MovingGameElement movElem, int pos_x, int pos_y) {
-//        boolean isPositionValid = true;
-//        if (pos_y < 0 || pos_y >= (B_HEIGHT - DOT_SIZE)) {
-//            isPositionValid = false;
-////            changeTargets(movElem);
-//        }
-//        if (pos_x < 0 || pos_x >= (B_WIDTH - DOT_SIZE)) {
-//            isPositionValid = false;
-////            changeTargets(movElem);
-//        }
-//
-//        for (FixedGameElement fxElem : fixedGameElementList) {
-//            if (fxElem.getClass() == Decoration.class) {
-//                if ((pos_x >= fxElem.getPosX() && pos_x <= fxElem.getPosX() + 3 * DOT_SIZE) && (pos_y >= fxElem.getPosY() && pos_y <= fxElem.getPosY() + 2 * DOT_SIZE)) {
-//                    isPositionValid = false;
-////                    changeTargets(movElem);
-//                }
-//            }
-//        }
-//
-//        return isPositionValid;
-//    }
+    public boolean isValidPosition(MovingGameElement movElem, int pos_x, int pos_y) {
+        boolean isPositionValid = true;
+        if (pos_y < 0 || pos_y >= (B_HEIGHT - DOT_SIZE)) {
+            isPositionValid = false;
+            changeTargets(movElem);
+        }
+        if (pos_x < 0 || pos_x >= (B_WIDTH - DOT_SIZE)) {
+            isPositionValid = false;
+            changeTargets(movElem);
+        }
+
+        for (FixedGameElement fxElem : fixedGameElementList) {
+            if (fxElem.getClass() == Decoration.class) {
+                if ((pos_x >= fxElem.getPosX() && pos_x <= fxElem.getPosX() + 3 * DOT_SIZE) && (pos_y >= fxElem.getPosY() && pos_y <= fxElem.getPosY() + 2 * DOT_SIZE)) {
+                    isPositionValid = false;
+                    changeTargets(movElem);
+                }
+            }
+        }
+
+        return isPositionValid;
+    }
 
 //    private void checkTemperature() {
 //        movingGameElementList.stream()
@@ -285,11 +285,11 @@ public class Board extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-//        if (inGame) {
+        if (inGame) {
 ////            checkFixedGameElementCollision();
 ////            checkFishCollision();
-////            move();
-//        }
+            move();
+        }
         repaint();
     }
 

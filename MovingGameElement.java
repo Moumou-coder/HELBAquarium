@@ -85,7 +85,7 @@ public abstract class MovingGameElement {
     }
 
 
-//    public abstract void move(Board board);
+    public abstract void move(Board board);
     
 
 }
