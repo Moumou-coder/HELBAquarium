@@ -2,9 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class MovingGameElement {
-
-    private int id;
-    private static int countId = 1;
     private int pos_x;
     private int pos_y;
     private int target_x;
@@ -15,21 +12,11 @@ public abstract class MovingGameElement {
     private int speed;
 
     public MovingGameElement(int pos_x, int pos_y, int target_x, int target_y, int speed) {
-        this.id = countId;
-        countId++;
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.target_x = target_x;
         this.target_y = target_y;
         this.speed = speed;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getPos_x() {
@@ -96,11 +83,6 @@ public abstract class MovingGameElement {
         this.speed = speed;
     }
 
-    public abstract String getType();
-
     public abstract void move(Board board);
-
-    public abstract void triggerAction(Board board);
-    
-
+    public abstract String getPathToImage();
 }
