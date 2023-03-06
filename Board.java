@@ -6,7 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -27,9 +27,8 @@ public class Board extends JPanel implements ActionListener {
     private HashMap<String, ImageIcon> movingGameElementImageMap;
     private int fishCounter;
     private String colorChoice;
-    private int initSpeedFish;
     private int speedFishIncreased;
-    public ArrayList<Fish> movingGameElementList;
+    public static ArrayList<Fish> movingGameElementList;
 
     private int void_x = -1 * B_WIDTH;
     private int void_y = -1 * B_HEIGHT;
@@ -68,55 +67,60 @@ public class Board extends JPanel implements ActionListener {
     private void initGame() {
 
         insectCounter = 0;
-        pelletCounter = 0;
-        decorationCounter = 0;
-
+        pelletCounter =0;
+        decorationCounter = 4;
         fishCounter = 5;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
+
         for (int i = 0; i < insectCounter; i++) {
-            fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate(), Insect.getPANEL_POWER()[i % Insect.getPANEL_POWER().length]));
+            createNewInsect();
         }
         for (int i = 0; i < pelletCounter; i++) {
-            fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
-        }
-        for (int i = 0; i < decorationCounter; i++) {
-            fixedGameElementList.add(new Decoration(getRandomCoordinate(), getRandomCoordinate()));
+            createNewPellet();
         }
 
-        //List contenant les poissons
+        //list contenant les éléments en mouvements
         movingGameElementList = new ArrayList<Fish>();
-        for (int i = 0; i < fishCounter; i++) {
-            colorChoice = Fish.getPANEL_COLOR()[(int) (Math.random() * Fish.getPANEL_COLOR().length)];
-            initSpeedFish = 7;
-            int[] randTarget = getArrayTarget();
-            Fish fish = null;
-            if(colorChoice.equals("Orange"))
-                fish = new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
-            if(colorChoice.equals("Blue"))
-                fish = new BlueFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
-            if(colorChoice.equals("Purple"))
-                fish = new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
-            if(colorChoice.equals("Red"))
-                fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish);
 
-            movingGameElementList.add(fish);
+        for (int i = 0; i < decorationCounter; i++) {
+            createNewDecoration();
         }
-
-
-        /* todo : Demander au prof si c'est ça qu'il veut par rapport au poisson mauve - decoration */
-//        checkQuantityOfDecorations();
-
+        for (int i = 0; i < fishCounter; i++) {
+            createNewFish();
+        }
 
         timer = new Timer(DELAY, this);
         timer.start();
     }
 
-//    private void checkQuantityOfDecorations() {
-//        movingGameElementList.stream().filter(fish -> fish.getType().equals("purpleFish")).forEach(fish -> fish.setSpeed(initSpeedFish + decorationCounter));
-//    }
+    private void createNewInsect(){
+        fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate(),  Insect.getPANEL_POWER()[(int) (Math.random() *  Insect.getPANEL_POWER().length)]));
+    }
+    private void createNewPellet() {
+        fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
+    }
 
+    private void createNewDecoration() {
+        fixedGameElementList.add(new Decoration(getRandomCoordinate(), getRandomCoordinate()));
+    }
+
+    private void createNewFish() {
+        colorChoice = Fish.getPANEL_COLOR()[(int) (Math.random() * Fish.getPANEL_COLOR().length)];
+        int[] randomTargetArray = getRandomPositionSidesBoard();
+        Fish fish = null;
+        if(colorChoice.equals("Orange"))
+            fish = new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]);
+        if(colorChoice.equals("Blue"))
+            fish = new BlueFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]);
+        if(colorChoice.equals("Purple"))
+            fish = new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]);
+        if(colorChoice.equals("Red"))
+            fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]);
+
+        movingGameElementList.add(fish);
+    }
 
     @Override
     public void paintComponent(Graphics g) {
@@ -141,6 +145,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+    /* todo : enlever le gameOver car il n y a plus vraiment de gameOver mtn */
     private void gameOver(Graphics g) {
 
         String msg = "Game Over";
@@ -152,92 +157,25 @@ public class Board extends JPanel implements ActionListener {
         g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
     }
 
-    /* todo: fusionner les deux méthodes checkCollision */
-//    private void checkFixedGameElementCollision() {
-//        for (FixedGameElement fxElem : fixedGameElementList) {
-//            for (MovingGameElement mvElem : movingGameElementList) {
-//                if ((mvElem.getPos_x() >= fxElem.getPosX() - (DOT_SIZE / 2) && mvElem.getPos_x() <= fxElem.getPosX() + (DOT_SIZE / 2)) && (mvElem.getPos_y() >= fxElem.getPosY() - (DOT_SIZE / 2) && mvElem.getPos_y() <= fxElem.getPosY() + (DOT_SIZE / 2))) {
-//                    if (fxElem.getClass() == Insect.class) {
-//                        speedFishIncreased = 14;
-//                        fxElem.setPosX(void_x);
-//                        fxElem.setPosY(void_y);
-//
-//                        Timer timer = new Timer(((Insect) fxElem).triggerAction(), actionEvent -> {
-//                            Timer timerSpeed = (Timer) actionEvent.getSource();
-//                            timerSpeed.stop();
-//                            mvElem.setSpeed(initSpeedFish);
-//
-//                        });
-//                        timer.start();
-//                        mvElem.setSpeed(speedFishIncreased);
-//
-//                    }
-//                    if (fxElem.getClass() == Pellet.class) {
-//                        fxElem.setPosX(void_x);
-//                        fxElem.setPosY(void_y);
-//                        stopSpeedFishes(mvElem.getType(), 10000);
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    private void checkFishCollision() {
-//        checkReproduction();
-//        ArrayList<MovingGameElement> redFishes = (ArrayList<MovingGameElement>) movingGameElementList.stream().filter(fish -> fish.getType().equals("redFish")).collect(Collectors.toList());
-//
-//        movingGameElementList.removeIf(fishOther -> {
-//            if (fishOther.getType().equals("redFish")) return false;
-//            return redFishes.stream().anyMatch(fishRed -> (fishOther.getPos_x() >= fishRed.getPos_x() - (DOT_SIZE / 2) && fishOther.getPos_x() <= fishRed.getPos_x() + (DOT_SIZE / 2)) && (fishOther.getPos_y() >= fishRed.getPos_y() - (DOT_SIZE / 2) && fishOther.getPos_y() <= fishRed.getPos_y() + (DOT_SIZE / 2)));
-//        });
-//    }
-
     private int getRandomCoordinate() {
         return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
+    }
+    private int[] getRandomPositionSidesBoard() {
+        int randPos = getRandomCoordinate();
+        int[][] tabPos = {{randPos, (B_HEIGHT - B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH - B_HEIGHT), randPos}};
+        return tabPos[(int) (Math.random() * tabPos.length)];
+    }
+
+    public void changeTargets(MovingGameElement mvElem) {
+        int[] randTarget = getRandomPositionSidesBoard();
+        mvElem.setTarget_x(randTarget[0]);
+        mvElem.setTarget_y(randTarget[1]);
     }
 
     private void move() {
         for (MovingGameElement mvElem : movingGameElementList) {
             mvElem.move(this);
         }
-    }
-
-    /* todo: changer nom méthode et variable plus logique */
-    public void changeTargets(MovingGameElement mvElem) {
-        int[] randTarget = getArrayTarget();
-        mvElem.setTarget_x(randTarget[0]);
-        mvElem.setTarget_y(randTarget[1]);
-    }
-
-    /* todo : limiter la reproduction des poissosn en fonction du nombres de poissons */
-    public void checkReproduction() {
-//        System.out.println("mode reproduction");
-//        int count = 0;
-//        ArrayList<MovingGameElement> copylist = new ArrayList<>(movingGameElementList);
-//
-//        for (MovingGameElement mvElem1 : copylist) {
-//            for (MovingGameElement mvElem2 : copylist) {
-//                if ((Objects.equals(mvElem1.getClass().getSimpleName(), mvElem2.getClass().getSimpleName())) &&
-//                        (mvElem1 != mvElem2) &&
-//                        (mvElem2.getPos_x() >= mvElem1.getPos_x() - (DOT_SIZE / 2) && mvElem2.getPos_x() <= mvElem1.getPos_x() + (DOT_SIZE / 2)) && (mvElem2.getPos_y() >= mvElem1.getPos_y() - (DOT_SIZE / 2) && mvElem2.getPos_y() <= mvElem1.getPos_y() + (DOT_SIZE / 2))) {
-//                    movingGameElementList.remove(mvElem1);
-//                    movingGameElementList.remove(mvElem2);
-//                    count++;
-//                    if (count % 2 == 0) {
-//                        for (int i = 0; i < 3; i++) {
-//                            int[] randTarget = getArrayTarget();
-////                            movingGameElementList.add(new Fish(getRandomCoordinate(), getRandomCoordinate(), randTarget[0], randTarget[1], initSpeedFish, mvElem1.getType().substring(0, mvElem2.getType().length() - 4)));
-//                        }
-//                    }
-//                }
-//            }
-//        }
-    }
-
-    private int[] getArrayTarget() {
-        int randPos = getRandomCoordinate();
-        int[][] tabPos = {{randPos, (B_HEIGHT - B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH - B_HEIGHT), randPos}};
-        return tabPos[(int) (Math.random() * tabPos.length)];
     }
 
     public boolean isValidPosition(MovingGameElement movElem, int pos_x, int pos_y) {
@@ -263,31 +201,112 @@ public class Board extends JPanel implements ActionListener {
         return isPositionValid;
     }
 
-//    private void checkTemperature() {
-//        movingGameElementList.stream()
-//                .filter(fish -> fish.getType().equals("redFish"))
-//                .forEach(fish -> fish.setSpeed(getBackground() == Color.cyan ? (initSpeedFish - 3) : (getBackground() == Color.pink ? (initSpeedFish + 3) : (initSpeedFish))));
-//    }
-//
-//    private void stopSpeedFishes(String fishType, int fishDelay){
-//
-//        ArrayList<MovingGameElement> otherFishes = (ArrayList<MovingGameElement>) movingGameElementList.stream().filter(fish -> !fish.getType().equals(fishType)).collect(Collectors.toList());
-//        var timer = new Timer(fishDelay, e -> {
-//            Timer timerSpeed = (Timer) e.getSource();
-//            timerSpeed.stop();
-//            otherFishes.forEach(fish -> fish.setSpeed(initSpeedFish));
-//        });
-//
-//        timer.start();
-//        otherFishes.forEach(fish -> fish.setSpeed(0));
-//        movingGameElementList.stream().filter(fish -> fish.getType().equals(fishType)).forEach(fish -> fish.setSpeed(initSpeedFish));
-//    }
+    private void checkFixedGameElementCollision() {
+        for (FixedGameElement fxElem : fixedGameElementList) {
+            for (MovingGameElement mvElem : movingGameElementList) {
+                if ((mvElem.getPos_x() >= fxElem.getPosX() - (DOT_SIZE / 2) && mvElem.getPos_x() <= fxElem.getPosX() + (DOT_SIZE / 2)) && (mvElem.getPos_y() >= fxElem.getPosY() - (DOT_SIZE / 2) && mvElem.getPos_y() <= fxElem.getPosY() + (DOT_SIZE / 2))) {
+                    if (fxElem instanceof Insect) {
+                        speedFishIncreased = 14;
+                        fxElem.setPosX(void_x);
+                        fxElem.setPosY(void_y);
+
+                        Timer timer = new Timer(((Insect) fxElem).triggerAction(), actionEvent -> {
+                            Timer timerSpeed = (Timer) actionEvent.getSource();
+                            timerSpeed.stop();
+                            mvElem.setSpeed(MovingGameElement.INIT_SPEED);
+
+                        });
+                        timer.start();
+                        mvElem.setSpeed(speedFishIncreased);
+
+                    }
+
+                    if (fxElem instanceof Pellet) {
+                        fxElem.setPosX(void_x);
+                        fxElem.setPosY(void_y);
+                        stopSpeedFishes(mvElem.getClass().getSimpleName(), 10000);
+                    }
+                }
+            }
+        }
+    }
+
+    private void stopSpeedFishes(String fishType, int delay){
+        ArrayList<Fish> otherFish = (ArrayList<Fish>) movingGameElementList.stream().filter(fish -> !fish.getClass().getSimpleName().equals(fishType)).collect(Collectors.toList());
+
+        var timer = new Timer(delay, e -> {
+            Timer timerSpeed = (Timer) e.getSource();
+            timerSpeed.stop();
+            otherFish.forEach(fish -> fish.setSpeed(MovingGameElement.INIT_SPEED));
+        });
+
+        timer.start();
+        otherFish.forEach(fish -> fish.setSpeed(0));
+        movingGameElementList.stream().filter(fish -> fish.getClass().getSimpleName().equals(fishType)).forEach(fish -> fish.setSpeed(MovingGameElement.INIT_SPEED));
+    }
+
+    private void checkFishCollision() {
+        checkReproduction();
+        redFishEatsOtherFishes();
+
+    }
+    private void redFishEatsOtherFishes(){
+        ArrayList<Fish> redFishes = (ArrayList<Fish>) movingGameElementList.stream().filter(fish -> fish instanceof RedFish).collect(Collectors.toList());
+
+        movingGameElementList.removeIf(fishOther -> {
+            if (fishOther instanceof RedFish) return false;
+            return redFishes.stream().anyMatch(fishRed -> (fishOther.getPos_x() >= fishRed.getPos_x() - (DOT_SIZE / 2) && fishOther.getPos_x() <= fishRed.getPos_x() + (DOT_SIZE / 2)) && (fishOther.getPos_y() >= fishRed.getPos_y() - (DOT_SIZE / 2) && fishOther.getPos_y() <= fishRed.getPos_y() + (DOT_SIZE / 2)));
+        });
+    }
+
+    /* todo : limiter la reproduction des poissosn en fonction du nombres de poissons */
+    public void checkReproduction() {
+        ArrayList<Fish> copyMovingList = new ArrayList<>(movingGameElementList);
+
+        int count = 0;
+        for (MovingGameElement mvElem1 : copyMovingList) {
+            for (MovingGameElement mvElem2 : copyMovingList) {
+                if ((mvElem1.getClass().getSimpleName().equals(mvElem2.getClass().getSimpleName())) &&
+                        (mvElem1 != mvElem2) &&
+                        (mvElem2.getPos_x() >= mvElem1.getPos_x() - (DOT_SIZE / 2) && mvElem2.getPos_x() <= mvElem1.getPos_x() + (DOT_SIZE / 2)) && (mvElem2.getPos_y() >= mvElem1.getPos_y() - (DOT_SIZE / 2) && mvElem2.getPos_y() <= mvElem1.getPos_y() + (DOT_SIZE / 2))) {
+                    movingGameElementList.remove(mvElem1);
+                    movingGameElementList.remove(mvElem2);
+                    count++;
+                    if (count % 2 == 0) {
+                        for (int i = 0; i < 3; i++) {
+                            int[] randomTargetArray = getRandomPositionSidesBoard();
+                            if(mvElem1 instanceof OrangeFish)
+                                movingGameElementList.add(new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+                            if(mvElem1 instanceof BlueFish)
+                                movingGameElementList.add(new BlueFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+                            if(mvElem1 instanceof PurpleFish)
+                                movingGameElementList.add(new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+                            if(mvElem1 instanceof RedFish)
+                                movingGameElementList.add(new RedFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkTemperature() {
+        movingGameElementList.stream()
+                .filter(fish -> fish instanceof RedFish)
+                .forEach(fish -> fish.setSpeed(getBackground() == Color.cyan ? (MovingGameElement.INIT_SPEED - 3) : (getBackground() == Color.pink ? (MovingGameElement.INIT_SPEED + 3) : (MovingGameElement.INIT_SPEED))));
+    }
+
+
+    public static int amountOfOrangeFish() {
+        return (int) movingGameElementList.stream().filter(fish -> fish instanceof OrangeFish).count();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (inGame) {
-////            checkFixedGameElementCollision();
-////            checkFishCollision();
+            checkFixedGameElementCollision();
+            checkFishCollision();
+            amountOfOrangeFish();
             move();
         }
         repaint();
@@ -298,44 +317,47 @@ public class Board extends JPanel implements ActionListener {
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
 
-            // Key event pour update temperature //
-//            if (key == KeyEvent.VK_NUMPAD0)
-//                System.out.println("reset");
-//            if (key == KeyEvent.VK_NUMPAD1) {
-//                setBackground(Color.cyan);
-//                checkTemperature();
-//            }
-//            if (key == KeyEvent.VK_NUMPAD2) {
-//                setBackground(Color.lightGray);
-//                checkTemperature();
-//            }
-//            if (key == KeyEvent.VK_NUMPAD3) {
-//                setBackground(Color.pink);
-//                checkTemperature();
-//            }
-//            if (key == KeyEvent.VK_NUMPAD4)
-//                fixedGameElementList.add(new Insect(getRandomCoordinate(), getRandomCoordinate(), PANEL_POWER[(int) (Math.random() * PANEL_POWER.length)]));
-//            if(key == KeyEvent.VK_NUMPAD5)
-//                fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
-//            /* todo : changement de targets comportement poissons */
-////            if(key == KeyEvent.VK_NUMPAD6)
-////                fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
-////            if(key == KeyEvent.VK_NUMPAD7)
-////                fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
-////            if(key == KeyEvent.VK_NUMPAD8)
-////                fixedGameElementList.add(new Pellet(getRandomCoordinate(), getRandomCoordinate()));
-//            if(key == KeyEvent.VK_NUMPAD9)
-//                createNewFish();
-//            /* todo : lorsque j'appuie sur autre que r, les rouges stop mais si je rappuie sur r, rien ne bouge tant que le miniteur n'a pas terminé => solution trop grand delay mais
-//            *   il faut savoir que si le mauve est pret du rouge, le rouge bouge à cause du delay*/
-//            if(key == KeyEvent.VK_R)
-//                stopSpeedFishes("redFish", 999999999);
-//            if(key == KeyEvent.VK_B)
-//                stopSpeedFishes("blueFish", 999999999);
-//            if(key == KeyEvent.VK_M)
-//                stopSpeedFishes("purpleFish", 999999999);
-//            if(key == KeyEvent.VK_O)
-//                stopSpeedFishes("orangeFish", 999999999);
+            /* todo : voir avoir prof si c'est pas mieux d'utiliser un switch au lieu d'avoir plusieurs if comme ça car une seule variable */
+            if (key == KeyEvent.VK_NUMPAD0){
+                timer.stop();
+                setBackground(Color.lightGray);
+                initGame();
+            }
+            if (key == KeyEvent.VK_NUMPAD1) {
+                setBackground(Color.cyan);
+                checkTemperature();
+            }
+            if (key == KeyEvent.VK_NUMPAD2) {
+                setBackground(Color.lightGray);
+                checkTemperature();
+            }
+            if (key == KeyEvent.VK_NUMPAD3) {
+                setBackground(Color.pink);
+                checkTemperature();
+            }
+            if (key == KeyEvent.VK_NUMPAD4)
+                createNewInsect();
+            if(key == KeyEvent.VK_NUMPAD5)
+                createNewPellet();
+            /* ------------------------------------------------------------ */
+            /* todo : changement de targets comportement poissons */
+            if(key == KeyEvent.VK_NUMPAD6)
+                System.out.println("mode ....");
+            if(key == KeyEvent.VK_NUMPAD7)
+                System.out.println("mode ....");
+            if(key == KeyEvent.VK_NUMPAD8)
+                System.out.println("mode ....");
+            /* ------------------------------------------------------------ */
+            if(key == KeyEvent.VK_NUMPAD9)
+                createNewFish();
+            if(key == KeyEvent.VK_R)
+                stopSpeedFishes("redFish", 999999999);
+            if(key == KeyEvent.VK_B)
+                stopSpeedFishes("blueFish", 999999999);
+            if(key == KeyEvent.VK_M)
+                stopSpeedFishes("purpleFish", 999999999);
+            if(key == KeyEvent.VK_O)
+                stopSpeedFishes("orangeFish", 999999999);
 
         }
     }

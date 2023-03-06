@@ -6,18 +6,21 @@ public abstract class MovingGameElement {
     private int pos_y;
     private int target_x;
     private int target_y;
+    /* ------------------------------------------------------------------------------------------------------- */
     /* todo : ça ne devrait plus etre ici car ce n est pas la meme chose pour tous les objets en mouvements... */
     private ArrayList<Integer> x_moveOptions;
     private  ArrayList<Integer> y_moveOptions;
     private  ArrayList<Double> distances;
+    /* -------------------------------------------------------------------------------------------------------- */
     private int speed;
+    public static final int INIT_SPEED = 7;
 
-    public MovingGameElement(int pos_x, int pos_y, int target_x, int target_y, int speed) {
+    public MovingGameElement(int pos_x, int pos_y, int target_x, int target_y) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.target_x = target_x;
         this.target_y = target_y;
-        this.speed = speed;
+        this.speed = INIT_SPEED;
     }
 
     public int getPos_x() {
@@ -83,7 +86,6 @@ public abstract class MovingGameElement {
     public void setSpeed(int speed) {
         this.speed = speed;
     }
-
 
     public abstract void move(Board board);
     

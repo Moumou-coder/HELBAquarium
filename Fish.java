@@ -3,73 +3,22 @@ import java.util.Collections;
 import java.util.function.Predicate;
 
 public abstract class Fish extends MovingGameElement {
-    private static final String PANEL_COLOR[] = {"Orange", "Red", "Blue", "Purple"};
+    private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"};
     protected int index;
-    protected final int SHORT_RANGE_DISTANCE = 50;
-    protected final int LONG_RANGE_DISTANCE = 100;
+    protected final int RANGE_DISTANCE = 900;
 
-    public Fish(int pos_x, int pos_y, int target_x, int target_y, int speed) {
-        super(pos_x, pos_y, target_x, target_y, speed);
+    public Fish(int pos_x, int pos_y, int target_x, int target_y) {
+        super(pos_x, pos_y, target_x, target_y);
     }
 
     public static String[] getPANEL_COLOR() {
         return PANEL_COLOR;
     }
 
-//    public String getType() {
-//        return "Fish";
-//    }
     @Override
     public abstract void move(Board board);
 
-//    public void move(Board board) {
-//        super.setX_moveOptions(new ArrayList<Integer>());
-//        super.setY_moveOptions(new ArrayList<Integer>());
-//        super.setDistances(new ArrayList<Double>());
-//
-//
-//        calculPossibilities(board, getX_moveOptions(), getY_moveOptions());
-//        calculDistance(getDistances(), getX_moveOptions(), getY_moveOptions(), getTarget_x(), getTarget_y());
-//        index = getDistances().indexOf(Collections.min(getDistances()));
-//
-//        if (getType().equals("orangeFish")) {
-//            setPositions();
-//            return; //afin d'éviter de rentrer dans le for pour les autres poissons
-//        }
-//
-//        for (MovingGameElement mvElemOther : board.movingGameElementList) {
-//
-//            ArrayList<Integer> tempoX = new ArrayList<Integer>();
-//            ArrayList<Integer> tempoY = new ArrayList<Integer>();
-//            ArrayList<Double> tempoDistance = new ArrayList<Double>();
-//
-//            if (getType().equals("redFish") && !mvElemOther.getType().equals("redFish")) {
-//                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false, LONG_RANGE_DISTANCE );
-//            }
-//            if (getType().equals("blueFish")  && this != mvElemOther && (mvElemOther.getType().equals("blueFish") || mvElemOther.getType().equals("purpleFish"))) {
-//                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance,false, SHORT_RANGE_DISTANCE);
-//            }
-//            if (getType().equals("purpleFish") && mvElemOther.getType().equals("redFish")) {
-//                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, true, LONG_RANGE_DISTANCE);
-//            }
-//        }
-//        setPositions();
-//    }
-
-    protected void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, boolean isMax, int range) {
-        /* todo : demander au prof comment le poisson bleu doit se comporter car lorsqu'un blue fish rencontre un autre, il reste sur la meme position car distance la plus courte */
-        /* todo : voir avec le prof si ok range pour les rouges ? */
-        calculPossibilities(board, tempoX, tempoY);
-        calculDistance(tempoDistance, tempoX, tempoY, mvElemOther.getPos_x(), mvElemOther.getPos_y());
-
-        boolean replace = isMax ? Collections.max(tempoDistance) < Collections.max(getDistances()) :  Collections.min(tempoDistance) < Collections.min(getDistances());
-        if (Collections.min(tempoDistance) < range && replace) {
-            setDistances(tempoDistance);
-            setX_moveOptions(tempoX);
-            setY_moveOptions(tempoY);
-            index = isMax ? getDistances().indexOf(Collections.max(getDistances())):getDistances().indexOf(Collections.min(getDistances()));
-        }
-    }
+    protected abstract void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, int range);
 
     protected void setPositions() {
         setPos_x(getX_moveOptions().get(index));
