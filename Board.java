@@ -29,6 +29,7 @@ public class Board extends JPanel implements ActionListener {
     private String colorChoice;
     private int speedFishIncreased;
     public static ArrayList<Fish> movingGameElementList;
+    ArrayList<Integer> probabilityOfReproduction = new ArrayList<Integer>();
 
     private int void_x = -1 * B_WIDTH;
     private int void_y = -1 * B_HEIGHT;
@@ -68,8 +69,8 @@ public class Board extends JPanel implements ActionListener {
 
         insectCounter = 0;
         pelletCounter =0;
-        decorationCounter = 4;
-        fishCounter = 5;
+        decorationCounter = 0;
+        fishCounter = 10;
 
         //List contenant les éléments fixes
         fixedGameElementList = new ArrayList<FixedGameElement>();
@@ -120,6 +121,8 @@ public class Board extends JPanel implements ActionListener {
             fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]);
 
         movingGameElementList.add(fish);
+        probabilityOfReproduction.add(0);
+
     }
 
     @Override
@@ -257,6 +260,8 @@ public class Board extends JPanel implements ActionListener {
             if (fishOther instanceof RedFish) return false;
             return redFishes.stream().anyMatch(fishRed -> (fishOther.getPos_x() >= fishRed.getPos_x() - (DOT_SIZE / 2) && fishOther.getPos_x() <= fishRed.getPos_x() + (DOT_SIZE / 2)) && (fishOther.getPos_y() >= fishRed.getPos_y() - (DOT_SIZE / 2) && fishOther.getPos_y() <= fishRed.getPos_y() + (DOT_SIZE / 2)));
         });
+
+        probabilityOfReproduction.removeIf(value -> value == 1);
     }
 
     /* todo : limiter la reproduction des poissosn en fonction du nombres de poissons */
@@ -269,22 +274,39 @@ public class Board extends JPanel implements ActionListener {
                 if ((mvElem1.getClass().getSimpleName().equals(mvElem2.getClass().getSimpleName())) &&
                         (mvElem1 != mvElem2) &&
                         (mvElem2.getPos_x() >= mvElem1.getPos_x() - (DOT_SIZE / 2) && mvElem2.getPos_x() <= mvElem1.getPos_x() + (DOT_SIZE / 2)) && (mvElem2.getPos_y() >= mvElem1.getPos_y() - (DOT_SIZE / 2) && mvElem2.getPos_y() <= mvElem1.getPos_y() + (DOT_SIZE / 2))) {
-                    movingGameElementList.remove(mvElem1);
-                    movingGameElementList.remove(mvElem2);
-                    count++;
-                    if (count % 2 == 0) {
-                        for (int i = 0; i < 3; i++) {
-                            int[] randomTargetArray = getRandomPositionSidesBoard();
-                            if(mvElem1 instanceof OrangeFish)
-                                movingGameElementList.add(new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
-                            if(mvElem1 instanceof BlueFish)
-                                movingGameElementList.add(new BlueFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
-                            if(mvElem1 instanceof PurpleFish)
-                                movingGameElementList.add(new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
-                            if(mvElem1 instanceof RedFish)
-                                movingGameElementList.add(new RedFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+
+                    int sizeOfList = probabilityOfReproduction.size();
+                    int randomValueOfReproductionList = (int)(Math.random()*sizeOfList);
+                    int retrievedValueOfReproductionList = probabilityOfReproduction.get(randomValueOfReproductionList);
+
+                    if(retrievedValueOfReproductionList == 0){
+                        movingGameElementList.remove(mvElem1);
+                        movingGameElementList.remove(mvElem2);
+
+                        count++;
+                        if (count % 2 == 0) {
+                            for (int i = 0; i < 3; i++) {
+                                int[] randomTargetArray = getRandomPositionSidesBoard();
+                                if(mvElem1 instanceof OrangeFish)
+                                    movingGameElementList.add(new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+                                if(mvElem1 instanceof BlueFish)
+                                    movingGameElementList.add(new BlueFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+                                if(mvElem1 instanceof PurpleFish)
+                                    movingGameElementList.add(new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+                                if(mvElem1 instanceof RedFish)
+                                    movingGameElementList.add(new RedFish(getRandomCoordinate(), getRandomCoordinate(), randomTargetArray[0], randomTargetArray[1]));
+
+                                for(int probability = 0; probability < Fish.getPANEL_COLOR().length; probability++) probabilityOfReproduction.add(1);
+                            }
                         }
                     }
+                    else{
+                        mvElem1.setPos_x(getRandomCoordinate());
+                        mvElem1.setPos_y(getRandomCoordinate());
+                        mvElem2.setPos_x(getRandomCoordinate());
+                        mvElem2.setPos_y(getRandomCoordinate());
+                    }
+
                 }
             }
         }
