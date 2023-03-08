@@ -30,6 +30,7 @@ public class Insect extends FixedGameElement {
         if(getPower().equals("weak")) durationSpeed = 5000;
         if(getPower().equals("medium")) durationSpeed = 10000;
         if(getPower().equals("strong")) durationSpeed = 15000;
+
         return durationSpeed;
     }
 }

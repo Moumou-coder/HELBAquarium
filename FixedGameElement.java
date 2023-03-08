@@ -25,9 +25,8 @@ public abstract class FixedGameElement {
     public void setPosY(int newPos_y){
         pos_y = newPos_y;
     }
-    
+
     public abstract String getType();
-    
 }
 
 
