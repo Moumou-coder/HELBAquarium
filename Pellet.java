@@ -9,9 +9,8 @@ public class Pellet extends FixedGameElement {
     }
 
     public String getType(){
-        return "pellet";
+        return "Pellet";
     }
-
 }
 
 

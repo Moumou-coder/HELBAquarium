@@ -47,3 +47,36 @@ if ((elem.getClass() == Insect.class)) {
 2) concernant les poissons bleu, ils sont juste téléportes une fois qu'il se touche ainsi que les autes poissons quand la probab de reproduction est faible.
 3) lorsque j'appuie sur autre que r, les rouges stop mais si je rappuie sur r, rien ne bouge tant que le miniteur n'a pas terminé => solution trop grand delay mais
 3.1)  il faut savoir que si le mauve est pret du rouge, le rouge bouge à cause du delay
+
+
+/* solution pour cloner l'objet */
+public abstract class Fish implements Cloneable {
+    int x, y;
+    int targetX, targetY;
+
+    public Fish(int x, int y, int targetX, int targetY) {
+        this.x = x;
+        this.y = y;
+        this.targetX = targetX;
+        this.targetY = targetY;
+    }
+
+    // Clone method to create a new object with different object reference
+    public Fish clone() {
+        try {
+            return (Fish) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // This should never happen, since we implement Cloneable
+            throw new InternalError();
+        }
+    }
+}
+
+class OrangeFish extends Fish {
+    public OrangeFish(int x, int y, int targetX, int targetY) {
+        super(x, y, targetX, targetY);
+    }
+}
+
+class BlueFish extends Fish {
+    public BlueFish(int x, int y, int targetX

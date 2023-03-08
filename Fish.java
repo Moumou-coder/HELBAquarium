@@ -1,11 +1,12 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.function.Predicate;
 
 public abstract class Fish extends MovingGameElement {
-    private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"}; /* todo : limitations si nouveau poisson ???  */
-    protected int index;
+    //    private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"}; /* todo : limitations si nouveau poisson ???  */
+    private static final String[] PANEL_COLOR = {"Blue"}; /* todo : limitations si nouveau poisson ???  */
+    protected int index; /* todo : classes filles pas ici */
     protected final int RANGE_DISTANCE = 900;
+    private String targetType;
+    private boolean isModeActivated = false;
 
     public Fish(int pos_x, int pos_y, int target_x, int target_y) {
         super(pos_x, pos_y, target_x, target_y);
@@ -15,10 +16,28 @@ public abstract class Fish extends MovingGameElement {
         return PANEL_COLOR;
     }
 
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public boolean isModeActivated() {
+        return isModeActivated;
+    }
+
+    public void setModeActivated(boolean modeActivated) {
+        isModeActivated = modeActivated;
+    }
+
     @Override
     public abstract void move(Board board);
 
     protected abstract void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, int range);
+
+    protected abstract void fishMode(Board board, FixedGameElement fixedElem, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance);
 
     protected void setPositions() {
         setPos_x(getX_moveOptions().get(index));
