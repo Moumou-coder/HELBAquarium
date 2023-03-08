@@ -2,6 +2,8 @@ public class Insect extends FixedGameElement {
 
     private String power;
     private int durationSpeed = 0;
+    private static final String[] PANEL_POWER = {"weak", "medium", "strong"};
+
 
     public Insect(int pos_x, int pos_y, String power) {
         super(pos_x, pos_y);
@@ -14,6 +16,10 @@ public class Insect extends FixedGameElement {
 
     public void setPower(String power) {
         this.power = power;
+    }
+
+    public static String[] getPANEL_POWER() {
+        return PANEL_POWER;
     }
 
     public String getType(){

@@ -40,3 +40,10 @@ if ((elem.getClass() == Insect.class)) {
                     }
                 }
 }
+
+
+/* Consignes - Remarques */
+1) vitesse de basse des poissons est diff des autres poissons dès le début dans la classe mere purple fish
+2) concernant les poissons bleu, ils sont juste téléportes une fois qu'il se touche ainsi que les autes poissons quand la probab de reproduction est faible.
+3) lorsque j'appuie sur autre que r, les rouges stop mais si je rappuie sur r, rien ne bouge tant que le miniteur n'a pas terminé => solution trop grand delay mais
+3.1)  il faut savoir que si le mauve est pret du rouge, le rouge bouge à cause du delay

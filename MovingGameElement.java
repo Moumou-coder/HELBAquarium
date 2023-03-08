@@ -2,34 +2,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class MovingGameElement {
-
-    private int id;
-    private static int countId = 1;
     private int pos_x;
     private int pos_y;
     private int target_x;
     private int target_y;
+    /* ------------------------------------------------------------------------------------------------------- */
+    /* todo : ça ne devrait plus etre ici car ce n est pas la meme chose pour tous les objets en mouvements... */
     private ArrayList<Integer> x_moveOptions;
     private  ArrayList<Integer> y_moveOptions;
     private  ArrayList<Double> distances;
+    /* -------------------------------------------------------------------------------------------------------- */
     private int speed;
+    public static final int INIT_SPEED = 7;
 
-    public MovingGameElement(int pos_x, int pos_y, int target_x, int target_y, int speed) {
-        this.id = countId;
-        countId++;
+    public MovingGameElement(int pos_x, int pos_y, int target_x, int target_y) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.target_x = target_x;
         this.target_y = target_y;
-        this.speed = speed;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        this.speed = INIT_SPEED;
     }
 
     public int getPos_x() {
@@ -96,11 +87,7 @@ public abstract class MovingGameElement {
         this.speed = speed;
     }
 
-    public abstract String getType();
-
     public abstract void move(Board board);
-
-    public abstract void triggerAction(Board board);
     
 
 }
