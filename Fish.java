@@ -3,7 +3,7 @@ import java.util.Collections;
 import java.util.function.Predicate;
 
 public abstract class Fish extends MovingGameElement {
-    private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"};
+    private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"}; /* todo : limitations si nouveau poisson ???  */
     protected int index;
     protected final int RANGE_DISTANCE = 900;
 

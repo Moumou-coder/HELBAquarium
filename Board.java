@@ -227,7 +227,8 @@ public class Board extends JPanel implements ActionListener {
                     if (fxElem instanceof Pellet) {
                         fxElem.setPosX(void_x);
                         fxElem.setPosY(void_y);
-                        stopSpeedFishes(mvElem.getClass().getSimpleName(), 10000);
+                        int delayToStopFish = 10000;
+                        stopSpeedFishes(mvElem.getClass().getSimpleName(), delayToStopFish);
                     }
                 }
             }
