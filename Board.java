@@ -63,10 +63,10 @@ public class Board extends JPanel implements ActionListener {
         fishList = new ArrayList<>();
         probabilityOfReproduction = new ArrayList<>();
 
-        int insectCounter = 5;
+        int insectCounter = 1;
         int pelletCounter = 1;
         int decorationCounter = 0;
-        int fishCounter = 1;
+        int fishCounter = 6;
 
         /* Creation of FixedGameElement Object */
         for (int i = 0; i < insectCounter; i++) {
@@ -222,8 +222,6 @@ public class Board extends JPanel implements ActionListener {
                             Timer timerSpeed = (Timer) actionEvent.getSource();
                             timerSpeed.stop();
                             fish.setSpeed(Fish.INIT_SPEED);
-                            System.out.println("ne pas");
-
                         });
                         timer.start();
                         fish.setSpeed(speedFishIncreased);
@@ -374,18 +372,15 @@ public class Board extends JPanel implements ActionListener {
                 createNewInsect();
             if (key == KeyEvent.VK_NUMPAD5)
                 createNewPellet();
-            /* ------------------------------------------------------------ */
-            /* todo : changement de targets comportement poissons */
             if (key == KeyEvent.VK_NUMPAD6) {
                 triggerMode(Insect.class.getSimpleName());
             }
             if (key == KeyEvent.VK_NUMPAD7) {
                 triggerMode(Pellet.class.getSimpleName());
             }
-//            if (key == KeyEvent.VK_NUMPAD8) {
-//                triggerMode(Fish.class.getSimpleName());
-//            }
-            /* ------------------------------------------------------------ */
+            if (key == KeyEvent.VK_NUMPAD8) {
+                triggerMode("ReproductionMode");
+            }
             if (key == KeyEvent.VK_NUMPAD9)
                 createNewFish();
             if (key == KeyEvent.VK_R)
