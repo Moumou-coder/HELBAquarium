@@ -11,24 +11,9 @@ public class PurpleFish extends Fish {
 
     @Override
     public void move(Board board) {
-        super.setX_moveOptions(new ArrayList<Integer>());
-        super.setY_moveOptions(new ArrayList<Integer>());
-        super.setDistances(new ArrayList<Double>());
-
-        calculPossibilities(board, getX_moveOptions(), getY_moveOptions());
-        calculDistance(getDistances(), getX_moveOptions(), getY_moveOptions(), getTarget_x(), getTarget_y());
-        super.index = getDistances().indexOf(Collections.min(getDistances()));
-
-        for (MovingGameElement mvElemOther : board.fishList) {
-            ArrayList<Integer> tempoX = new ArrayList<Integer>();
-            ArrayList<Integer> tempoY = new ArrayList<Integer>();
-            ArrayList<Double> tempoDistance = new ArrayList<Double>();
-
-
-            if (mvElemOther.getClass().getSimpleName().equals("RedFish")) {
-                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, RANGE_DISTANCE);
-            }
-        }
+        setMoveAndDistances();
+        
+        defaultFishBehaviour(board);
 
         if (isModeActivated()) {
             if (getTargetType().equals(Insect.class.getSimpleName())) {
@@ -54,6 +39,17 @@ public class PurpleFish extends Fish {
                     ArrayList<Double> tempoDistance = new ArrayList<Double>();
                     reproductionMode(board, m, tempoX, tempoY, tempoDistance);
                 });
+            }
+        }else{
+            for (MovingGameElement mvElemOther : board.fishList) {
+                ArrayList<Integer> tempoX = new ArrayList<Integer>();
+                ArrayList<Integer> tempoY = new ArrayList<Integer>();
+                ArrayList<Double> tempoDistance = new ArrayList<Double>();
+
+
+                if (mvElemOther.getClass().getSimpleName().equals("RedFish")) {
+                    fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, RANGE_DISTANCE);
+                }
             }
         }
 

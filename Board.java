@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 public class Board extends JPanel implements ActionListener {
 
-    private final int B_WIDTH = 800;
-    private final int B_HEIGHT = 800;
+    private final int B_WIDTH = 500;
+    private final int B_HEIGHT = 500;
     private final int DOT_SIZE = 10;
-    private boolean inGame = true;
+    private final boolean inGame = true;
     private Timer timer;
     private HashMap<String, ImageIcon> fixedGameElementImageMap;
     private HashMap<String, ImageIcon> movingGameElementImageMap;
@@ -63,9 +63,9 @@ public class Board extends JPanel implements ActionListener {
         fishList = new ArrayList<>();
         probabilityOfReproduction = new ArrayList<>();
 
-        int insectCounter = 1;
-        int pelletCounter = 1;
-        int decorationCounter = 0;
+        int insectCounter = 3;
+        int pelletCounter = 3;
+        final int decorationCounter = 0;
         int fishCounter = 6;
 
         /* Creation of FixedGameElement Object */
@@ -153,7 +153,8 @@ public class Board extends JPanel implements ActionListener {
 
     private int[] getRandomPositionSidesBoard() {
         int randPos = getRandomCoordinate();
-        int[][] tabPos = {{randPos, (B_HEIGHT - B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH - B_HEIGHT), randPos}};
+        // 0 vaut tout simplement soit (B_HEIGHT-B_HEIGHT) soit (B_WIDTH-B_WIDTH). Intelliji remplace tout simplement ça par 0.
+        int[][] tabPos = {{randPos, 0}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {0, randPos}};
         return tabPos[(int) (Math.random() * tabPos.length)];
     }
 
@@ -291,6 +292,7 @@ public class Board extends JPanel implements ActionListener {
                         count++;
                         if (count % 2 == 0) {
                             for (int i = 0; i < 3; i++) {
+                                /* todo : trouver une solution afin d'utiliser le polymorphisme et réfactorer ce moyen - mettre dans le rapport */
                                 int[] TargetArraySides = getRandomPositionSidesBoard();
                                 if (fish instanceof OrangeFish)
                                     fishList.add(new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]));

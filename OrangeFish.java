@@ -11,13 +11,8 @@ public class OrangeFish extends Fish {
 
     @Override
     public void move(Board board) {
-        super.setX_moveOptions(new ArrayList<Integer>());
-        super.setY_moveOptions(new ArrayList<Integer>());
-        super.setDistances(new ArrayList<Double>());
-
-        calculPossibilities(board, getX_moveOptions(), getY_moveOptions());
-        calculDistance(getDistances(), getX_moveOptions(), getY_moveOptions(), getTarget_x(), getTarget_y());
-        index = getDistances().indexOf(Collections.min(getDistances()));
+        setMoveAndDistances();
+        defaultFishBehaviour(board);
 
         if (isModeActivated()) {
             if (getTargetType().equals(Insect.class.getSimpleName())) {
@@ -47,7 +42,6 @@ public class OrangeFish extends Fish {
         }
 
         super.setPositions();
-
     }
 
     @Override

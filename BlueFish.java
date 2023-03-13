@@ -9,24 +9,11 @@ public class BlueFish extends Fish {
 
     @Override
     public void move(Board board) {
-        super.setX_moveOptions(new ArrayList<Integer>());
-        super.setY_moveOptions(new ArrayList<Integer>());
-        super.setDistances(new ArrayList<Double>());
+        setMoveAndDistances();
 
-        calculPossibilities(board, getX_moveOptions(), getY_moveOptions());
-        calculDistance(getDistances(), getX_moveOptions(), getY_moveOptions(), getTarget_x(), getTarget_y());
-        super.index = getDistances().indexOf(Collections.min(getDistances()));
-
-        for (MovingGameElement mvElemOther : board.fishList) {
-            ArrayList<Integer> tempoX = new ArrayList<Integer>();
-            ArrayList<Integer> tempoY = new ArrayList<Integer>();
-            ArrayList<Double> tempoDistance = new ArrayList<Double>();
+        defaultFishBehaviour(board);
 
 
-            if (this != mvElemOther && (mvElemOther.getClass().getSimpleName().equals("BlueFish") || mvElemOther.getClass().getSimpleName().equals("PurpleFish"))) {
-                fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, RANGE_DISTANCE);
-            }
-        }
 
         if (isModeActivated()) {
             if (getTargetType().equals(Insect.class.getSimpleName())) {
@@ -52,6 +39,17 @@ public class BlueFish extends Fish {
                     ArrayList<Double> tempoDistance = new ArrayList<Double>();
                     reproductionMode(board, m, tempoX, tempoY, tempoDistance);
                 });
+            }
+        }else{
+            for (MovingGameElement mvElemOther : board.fishList) {
+                ArrayList<Integer> tempoX = new ArrayList<Integer>();
+                ArrayList<Integer> tempoY = new ArrayList<Integer>();
+                ArrayList<Double> tempoDistance = new ArrayList<Double>();
+
+
+                if (this != mvElemOther && (mvElemOther.getClass().getSimpleName().equals("BlueFish") || mvElemOther.getClass().getSimpleName().equals("PurpleFish"))) {
+                    fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, RANGE_DISTANCE);
+                }
             }
         }
 
