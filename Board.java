@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
 
 public class Board extends JPanel implements ActionListener {
 
-    private final int B_WIDTH = 800;
-    private final int B_HEIGHT = 800;
+    private final int B_WIDTH = 500;
+    private final int B_HEIGHT = 500;
     private final int DOT_SIZE = 10;
     private boolean inGame = true;
+    private final int DECO_WIDTH = 30;
+    private final int DECO_HEIGHT = 20;
     private Timer timer;
     private HashMap<String, ImageIcon> fixedGameElementImageMap;
     private HashMap<String, ImageIcon> movingGameElementImageMap;
@@ -63,10 +65,10 @@ public class Board extends JPanel implements ActionListener {
         fishList = new ArrayList<>();
         probabilityOfReproduction = new ArrayList<>();
 
-        int insectCounter = 1;
-        int pelletCounter = 1;
-        int decorationCounter = 0;
-        int fishCounter = 6;
+        int insectCounter = 0;
+        int pelletCounter = 0;
+        final int decorationCounter = 4;
+        int fishCounter = 0;
 
         /* Creation of FixedGameElement Object */
         for (int i = 0; i < insectCounter; i++) {
@@ -99,7 +101,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void createNewDecoration() {
         final int posX = getRandomCoordinateX();
-        decorationList.add(new Decoration(posX, getRandomCoordinate(), posX, getRandomTargetYUpDown()));
+        decorationList.add(new Decoration(posX, getRandomCoordinateDeco(), posX, getRandomTargetYUpDown()));
     }
 
     private void createNewFish() {
@@ -147,18 +149,24 @@ public class Board extends JPanel implements ActionListener {
         return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
     }
 
+    private int getRandomCoordinateDeco() {
+        return (int) (Math.random() * (B_WIDTH - DECO_WIDTH));
+    }
+
     private int getRandomCoordinateX() {
         return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
     }
 
     private int[] getRandomPositionSidesBoard() {
         int randPos = getRandomCoordinate();
-        int[][] tabPos = {{randPos, (B_HEIGHT - B_WIDTH)}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {(B_WIDTH - B_HEIGHT), randPos}};
+        // 0 = (B_WIDTH - B_WIDTH) OU (B_HEIGHT - B_HEIGHT) => IntelliJIDEA me demande de changer si je ne met pas le 0.
+        int[][] tabPos = {{randPos, 0}, {B_WIDTH, randPos}, {randPos, B_HEIGHT}, {0, randPos}};
         return tabPos[(int) (Math.random() * tabPos.length)];
     }
 
     private int getRandomTargetYUpDown() {
-        int[] arrayUpDown = {0, B_HEIGHT};
+        // 0 = (B_WIDTH - B_WIDTH) OU (B_HEIGHT - B_HEIGHT) => IntelliJIDEA me demande de changer si je ne met pas le 0.
+        int[] arrayUpDown = {0, (B_HEIGHT-DECO_HEIGHT)};
         int indexArray = (int) (Math.random() * arrayUpDown.length);
         return arrayUpDown[indexArray];
     }
@@ -178,9 +186,9 @@ public class Board extends JPanel implements ActionListener {
         boolean isPositionValid = true;
 
         if (movingObject instanceof Decoration) {
-            if (pos_y < 0 || pos_y >= (B_HEIGHT - DOT_SIZE)) {
+            if (pos_y < 0 || pos_y >= (B_HEIGHT - DECO_HEIGHT)) {
                 isPositionValid = false;
-                movingObject.setTarget_y((pos_y < 0) ? 450 : 0);
+                movingObject.setTarget_y((pos_y < 0) ? (B_HEIGHT - DECO_HEIGHT) : 0);
             }
         } else {
             if (pos_y < 0 || pos_y >= (B_HEIGHT - DOT_SIZE)) {
@@ -191,11 +199,8 @@ public class Board extends JPanel implements ActionListener {
                 isPositionValid = false;
                 changeTargets((Fish) movingObject);
             }
-
             for (Decoration deco : decorationList) {
-                int doubleHeight = 2;
-                int tripleWidth = 3;
-                if ((pos_x >= deco.getPos_x() - DOT_SIZE && pos_x <= deco.getPos_x() + DOT_SIZE * tripleWidth) && (pos_y >= deco.getPos_y() - DOT_SIZE && pos_y <= deco.getPos_y() + DOT_SIZE * doubleHeight)) {
+                if ((pos_x >= deco.getPos_x() - DECO_WIDTH && pos_x <= deco.getPos_x() + DECO_WIDTH) && (pos_y >= deco.getPos_y() - DECO_HEIGHT && pos_y <= deco.getPos_y() + DECO_HEIGHT)) {
                     isPositionValid = false;
                     changeTargets((Fish) movingObject);
                 }

@@ -7,7 +7,6 @@ public abstract class MovingGameElement {
     private int target_x;
     private int target_y;
     /* ------------------------------------------------------------------------------------------------------- */
-    /* todo : ça ne devrait plus etre ici car ce n est pas la meme chose pour tous les objets en mouvements... */
     private ArrayList<Integer> x_moveOptions;
     private  ArrayList<Integer> y_moveOptions;
     private  ArrayList<Double> distances;
