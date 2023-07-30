@@ -79,7 +79,6 @@ public class Board extends JPanel implements ActionListener {
         }
 
         /* Creation of MovingGameElement Object */
-
         for (int i = 0; i < DECO_AMOUNT; i++) {
             createNewDecoration();
         }
@@ -249,7 +248,6 @@ public class Board extends JPanel implements ActionListener {
             if (fishOther instanceof RedFish) return false;
             return redFishes.stream().anyMatch(fishRed -> (fishOther.getPos_x() >= fishRed.getPos_x() - (DOT_SIZE / 2) && fishOther.getPos_x() <= fishRed.getPos_x() + (DOT_SIZE / 2)) && (fishOther.getPos_y() >= fishRed.getPos_y() - (DOT_SIZE / 2) && fishOther.getPos_y() <= fishRed.getPos_y() + (DOT_SIZE / 2)));
         });
-
         probabilityOfReproduction.removeIf(value -> !value);
     }
 
@@ -377,6 +375,4 @@ public class Board extends JPanel implements ActionListener {
 
         }
     }
-
-
 }
