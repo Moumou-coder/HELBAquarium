@@ -6,11 +6,9 @@ public abstract class MovingGameElement {
     private int pos_y;
     private int target_x;
     private int target_y;
-    /* ------------------------------------------------------------------------------------------------------- */
     private ArrayList<Integer> x_moveOptions;
-    private  ArrayList<Integer> y_moveOptions;
-    private  ArrayList<Double> distances;
-    /* -------------------------------------------------------------------------------------------------------- */
+    private ArrayList<Integer> y_moveOptions;
+    private ArrayList<Double> distances;
     private int speed;
     public static final int INIT_SPEED = 7;
 
@@ -87,6 +85,31 @@ public abstract class MovingGameElement {
     }
 
     public abstract void move(Board board);
-    
 
+    protected double getDistance(int pos_x0, int pos_y0, int pos_x1, int pos_y1) {
+        int x_dist = pos_x1 - pos_x0;
+        int y_dist = pos_y1 - pos_y0;
+        return Math.sqrt(Math.pow(x_dist, 2) + Math.pow(y_dist, 2));
+    }
+
+    protected void calculPossibilities(Board board, ArrayList<Integer> arrayListX, ArrayList<Integer> arrayListY) {
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+
+                int test_pos_x = getPos_x() + i * getSpeed();
+                int test_pos_y = getPos_y() + j * getSpeed();
+                if (board.isValidPosition(this, test_pos_x, test_pos_y)) {
+                    arrayListX.add(test_pos_x);
+                    arrayListY.add(test_pos_y);
+                }
+            }
+        }
+    }
+
+    protected void calculDistance(ArrayList<Double> arraylistDistance, ArrayList<Integer> arrayListX, ArrayList<Integer> arrayListY, int targetX, int targetY) {
+        for (int i = 0; i < arrayListX.size(); i++) {
+            double distance = getDistance(targetX, targetY, arrayListX.get(i), arrayListY.get(i));
+            arraylistDistance.add(distance);
+        }
+    }
 }

@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class Board extends JPanel implements ActionListener {
 
-    private final int B_WIDTH = 500;
-    private final int B_HEIGHT = 500;
+    private final int B_WIDTH = 600;
+    private final int B_HEIGHT = 600;
     private final int DOT_SIZE = 10;
     private boolean inGame = true;
     private final int DECO_WIDTH = 30;
@@ -65,10 +65,10 @@ public class Board extends JPanel implements ActionListener {
         fishList = new ArrayList<>();
         probabilityOfReproduction = new ArrayList<>();
 
-        int insectCounter = 10;
-        int pelletCounter = 10;
-        final int decorationCounter = 4;
-        int fishCounter = 1;
+        int insectCounter = 1;
+        int pelletCounter = 1;
+        int fishCounter = 4;
+        final int DECO_AMOUNT = 4;
 
         /* Creation of FixedGameElement Object */
         for (int i = 0; i < insectCounter; i++) {
@@ -79,7 +79,8 @@ public class Board extends JPanel implements ActionListener {
         }
 
         /* Creation of MovingGameElement Object */
-        for (int i = 0; i < decorationCounter; i++) {
+
+        for (int i = 0; i < DECO_AMOUNT; i++) {
             createNewDecoration();
         }
         for (int i = 0; i < fishCounter; i++) {
