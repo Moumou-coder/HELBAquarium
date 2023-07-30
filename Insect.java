@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 public class Insect extends FixedGameElement {
 
     private String power;
@@ -32,6 +34,22 @@ public class Insect extends FixedGameElement {
         if(getPower().equals("strong")) durationSpeed = 15000;
 
         return durationSpeed;
+    }
+
+    @Override
+    public void handleCollision(Fish fish, int void_x, int void_y){
+        int speedFishIncreased = 14;
+        this.setPosX(void_x);
+        this.setPosY(void_y);
+
+        Timer timer = new Timer(this.triggerAction(), actionEvent -> {
+            Timer timerSpeed = (Timer) actionEvent.getSource();
+            timerSpeed.stop();
+            fish.setSpeed(Fish.INIT_SPEED);
+        });
+        timer.start();
+        fish.setSpeed(speedFishIncreased);
+
     }
 }
 
