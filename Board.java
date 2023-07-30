@@ -365,13 +365,13 @@ public class Board extends JPanel implements ActionListener {
             if (key == KeyEvent.VK_NUMPAD9)
                 createNewFish();
             if (key == KeyEvent.VK_R)
-                stopSpeedFishes("redFish", hugeDelay);
+                stopSpeedFishes("RedFish", hugeDelay);
             if (key == KeyEvent.VK_B)
-                stopSpeedFishes("blueFish", hugeDelay);
+                stopSpeedFishes("BlueFish", hugeDelay);
             if (key == KeyEvent.VK_M)
-                stopSpeedFishes("purpleFish", hugeDelay);
+                stopSpeedFishes("PurpleFish", hugeDelay);
             if (key == KeyEvent.VK_O)
-                stopSpeedFishes("orangeFish", hugeDelay);
+                stopSpeedFishes("OrangeFish", hugeDelay);
 
         }
     }
