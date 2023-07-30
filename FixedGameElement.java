@@ -27,6 +27,8 @@ public abstract class FixedGameElement {
     }
 
     public abstract String getType();
+
+    public abstract void handleCollision(Fish fish, int void_x, int void_y);
 }
 
 

@@ -20,9 +20,9 @@ public class Board extends JPanel implements ActionListener {
     private HashMap<String, ImageIcon> fixedGameElementImageMap;
     private HashMap<String, ImageIcon> movingGameElementImageMap;
     public ArrayList<FixedGameElement> fixedGameElementList;
-    public ArrayList<Decoration> decorationList;
+    public static ArrayList<Decoration> decorationList;
     public static ArrayList<Fish> fishList;
-    private ArrayList<Integer> probabilityOfReproduction;
+    private ArrayList<Boolean> probabilityOfReproduction;
 
     public Board() {
         initBoard();
@@ -65,10 +65,10 @@ public class Board extends JPanel implements ActionListener {
         fishList = new ArrayList<>();
         probabilityOfReproduction = new ArrayList<>();
 
-        int insectCounter = 0;
-        int pelletCounter = 0;
+        int insectCounter = 10;
+        int pelletCounter = 10;
         final int decorationCounter = 4;
-        int fishCounter = 0;
+        int fishCounter = 1;
 
         /* Creation of FixedGameElement Object */
         for (int i = 0; i < insectCounter; i++) {
@@ -118,7 +118,7 @@ public class Board extends JPanel implements ActionListener {
             fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]);
 
         fishList.add(fish);
-        probabilityOfReproduction.add(0);
+        probabilityOfReproduction.add(true);
 
     }
 
@@ -130,7 +130,6 @@ public class Board extends JPanel implements ActionListener {
 
     private void doDrawing(Graphics g) {
         if (inGame) {
-            /* todo : refactor */
             for (FixedGameElement elem : fixedGameElementList) {
                 g.drawImage(fixedGameElementImageMap.get(elem.getType()).getImage(), elem.getPosX(), elem.getPosY(), this);
             }
@@ -166,7 +165,7 @@ public class Board extends JPanel implements ActionListener {
 
     private int getRandomTargetYUpDown() {
         // 0 = (B_WIDTH - B_WIDTH) OU (B_HEIGHT - B_HEIGHT) => IntelliJIDEA me demande de changer si je ne met pas le 0.
-        int[] arrayUpDown = {0, (B_HEIGHT-DECO_HEIGHT)};
+        int[] arrayUpDown = {0, (B_HEIGHT - DECO_HEIGHT)};
         int indexArray = (int) (Math.random() * arrayUpDown.length);
         return arrayUpDown[indexArray];
     }
@@ -216,29 +215,8 @@ public class Board extends JPanel implements ActionListener {
 
         for (FixedGameElement fixedElem : fixedGameElementList) {
             for (Fish fish : fishList) {
-                /* todo : eviter constante magique pour le dotsize - corriger s'il faut la condition */
                 if ((fish.getPos_x() >= fixedElem.getPosX() - (DOT_SIZE) && fish.getPos_x() <= fixedElem.getPosX() + (DOT_SIZE)) && (fish.getPos_y() >= fixedElem.getPosY() - (DOT_SIZE) && fish.getPos_y() <= fixedElem.getPosY() + (DOT_SIZE))) {
-                    if (fixedElem instanceof Insect) {
-                        int speedFishIncreased = 14;
-                        fixedElem.setPosX(void_x);
-                        fixedElem.setPosY(void_y);
-
-                        Timer timer = new Timer(((Insect) fixedElem).triggerAction(), actionEvent -> {
-                            Timer timerSpeed = (Timer) actionEvent.getSource();
-                            timerSpeed.stop();
-                            fish.setSpeed(Fish.INIT_SPEED);
-                        });
-                        timer.start();
-                        fish.setSpeed(speedFishIncreased);
-
-                    }
-                    /* todo : mettre la logique de insect et pellet dans leur classe respective */
-                    if (fixedElem instanceof Pellet) {
-                        fixedElem.setPosX(void_x);
-                        fixedElem.setPosY(void_y);
-                        int delayToStopFish = 10000;
-                        stopSpeedFishes(fish.getClass().getSimpleName(), delayToStopFish);
-                    }
+                    fixedElem.handleCollision(fish, void_x, void_y);
                 }
             }
         }
@@ -271,12 +249,11 @@ public class Board extends JPanel implements ActionListener {
             return redFishes.stream().anyMatch(fishRed -> (fishOther.getPos_x() >= fishRed.getPos_x() - (DOT_SIZE / 2) && fishOther.getPos_x() <= fishRed.getPos_x() + (DOT_SIZE / 2)) && (fishOther.getPos_y() >= fishRed.getPos_y() - (DOT_SIZE / 2) && fishOther.getPos_y() <= fishRed.getPos_y() + (DOT_SIZE / 2)));
         });
 
-        probabilityOfReproduction.removeIf(value -> value == 1);
+        probabilityOfReproduction.removeIf(value -> !value);
     }
 
     public void checkReproduction() {
         ArrayList<Fish> copyMovingList = new ArrayList<>(fishList);
-        /* todo : changer la liste de probabiliy en boolean au lieu que ce soit des integer */
 
         int count = 0;
         for (Fish fish : copyMovingList) {
@@ -287,9 +264,9 @@ public class Board extends JPanel implements ActionListener {
 
                     int sizeOfList = probabilityOfReproduction.size();
                     int randomValueOfReproductionList = (int) (Math.random() * sizeOfList);
-                    int retrievedValueOfReproductionList = probabilityOfReproduction.get(randomValueOfReproductionList);
+                    boolean retrievedValueOfReproductionList = probabilityOfReproduction.get(randomValueOfReproductionList);
 
-                    if (retrievedValueOfReproductionList == 0) {
+                    if (retrievedValueOfReproductionList) {
                         fishList.remove(fish);
                         fishList.remove(secondFish);
 
@@ -307,7 +284,7 @@ public class Board extends JPanel implements ActionListener {
                                     fishList.add(new RedFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]));
 
                                 for (int probability = 0; probability < Fish.getPANEL_COLOR().length; probability++)
-                                    probabilityOfReproduction.add(1);
+                                    probabilityOfReproduction.add(false);
                             }
                         }
                     } else {

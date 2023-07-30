@@ -1,8 +1,8 @@
 import java.util.ArrayList;
 
 public abstract class Fish extends MovingGameElement {
-//        private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"}; /* todo : limitations si nouveau poisson ???  */
-        private static final String[] PANEL_COLOR = {"Orange"}; /* todo : limitations si nouveau poisson ???  */
+//        private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"}; /* todo : limitations si nouveau poisson ??? - réponse : fichier texte et le programme reprendra depuis le fichier texte et injecter les poissons en créant des classes en fonction de ce qu'il y a dans le .txt au runtime = injection dependace   */
+        private static final String[] PANEL_COLOR = {"Blue"};
     protected int index; /* todo : classes filles pas ici  */
     protected final int RANGE_DISTANCE = 900;
     private String targetType;
