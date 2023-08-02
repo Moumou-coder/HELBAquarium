@@ -42,7 +42,7 @@ public class Board extends JPanel implements ActionListener {
         fixedGameElementImageMap = new HashMap<>();
         movingGameElementImageMap = new HashMap<>();
 
-        /* HashMap for FixedGameElement */
+        /* HashMap reprenant le type de l'objet et le chemin des éléments fixes du jeu (String) */
         for (String p : Insect.getPANEL_POWER()) {
             fixedGameElementImageMap.put(p + "Insect", new ImageIcon("./assets/" + p + "Insect.png"));
         }
@@ -50,7 +50,8 @@ public class Board extends JPanel implements ActionListener {
         ImageIcon iip = new ImageIcon(Pellet.getPathToImage());
         fixedGameElementImageMap.put("Pellet", iip);
 
-        /* HashMap for MovingGameElement */
+
+        /* HashMap reprenant le type de l'objet et le chemin des éléments mobiles du jeu (String) */
         ImageIcon iid = new ImageIcon(Decoration.getPathToImage());
         movingGameElementImageMap.put("Decoration", iid);
 
@@ -60,6 +61,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void initGame() {
+        /* Initialisation des arraylist et du nombre d'objets qu'on souhaite afficher */
         fixedGameElementList = new ArrayList<>();
         decorationList = new ArrayList<>();
         fishList = new ArrayList<>();
@@ -70,7 +72,7 @@ public class Board extends JPanel implements ActionListener {
         int fishCounter = 4;
         final int DECO_AMOUNT = 4;
 
-        /* Creation of FixedGameElement Object */
+        /* Création des objets éléments fixes du jeu en fonction du nombre d'objets qu'on souhaite affiche (initialisé juste dessus) */
         for (int i = 0; i < insectCounter; i++) {
             createNewInsect();
         }
@@ -78,7 +80,7 @@ public class Board extends JPanel implements ActionListener {
             createNewPellet();
         }
 
-        /* Creation of MovingGameElement Object */
+        /* Création des objets éléments mobiles du jeu */
         for (int i = 0; i < DECO_AMOUNT; i++) {
             createNewDecoration();
         }
@@ -100,8 +102,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void createNewDecoration() {
-        final int posX = getRandomCoordinateX();
-        decorationList.add(new Decoration(posX, getRandomCoordinateDeco(), posX, getRandomTargetYUpDown()));
+        final int absolutePositionX = getRandomCoordinateDecoX();
+        decorationList.add(new Decoration(absolutePositionX, getRandomCoordinateDecoY(), absolutePositionX, getRandomTargetYUpDown()));
     }
 
     private void createNewFish() {
@@ -144,16 +146,19 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+    /* méthode retournant un nombre qui servira pour la position aléatoire des poissons, insectes et pilules */
     private int getRandomCoordinate() {
         return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
     }
 
-    private int getRandomCoordinateDeco() {
-        return (int) (Math.random() * (B_WIDTH - DECO_WIDTH));
+    /* méthode retournant un nombre pour la position verticale aléatoire des décorations, car la déco a une dimension différente */
+    private int getRandomCoordinateDecoY() {
+        return (int) (Math.random() * (B_WIDTH - DECO_HEIGHT));
     }
 
-    private int getRandomCoordinateX() {
-        return (int) (Math.random() * (B_WIDTH - DOT_SIZE));
+    /* méthode retournant un nombre pour la position horizontale aléatoire des décorations, car la déco a une dimension différente */
+    private int getRandomCoordinateDecoX() {
+        return (int) (Math.random() * (B_WIDTH - DECO_WIDTH));
     }
 
     private int[] getRandomPositionSidesBoard() {
@@ -163,6 +168,7 @@ public class Board extends JPanel implements ActionListener {
         return tabPos[(int) (Math.random() * tabPos.length)];
     }
 
+    /* méthode retournant un arraylist des 2 bouts du board pour que la déco puisse avoir une trajectoire verticale en continu */
     private int getRandomTargetYUpDown() {
         // 0 = (B_WIDTH - B_WIDTH) OU (B_HEIGHT - B_HEIGHT) => IntelliJIDEA me demande de changer si je ne met pas le 0.
         int[] arrayUpDown = {0, (B_HEIGHT - DECO_HEIGHT)};
@@ -170,6 +176,7 @@ public class Board extends JPanel implements ActionListener {
         return arrayUpDown[indexArray];
     }
 
+    /* méthode définissant une cible aléatoire pour les poissons au sein du board */
     public void changeTargets(Fish fish) {
         int[] randTarget = getRandomPositionSidesBoard();
         fish.setTarget_x(randTarget[0]);
@@ -181,6 +188,8 @@ public class Board extends JPanel implements ActionListener {
         decorationList.forEach(d -> d.move(this));
     }
 
+    /* Cette méthode vérifie la position des éléments mobiles dans le jeu afin d'assurer qu'ils sont bien dans le board
+    * ainsi que si un poisson rencontre une décoration afin qu'il ait une nouvelle direction aléatoire */
     public boolean isValidPosition(MovingGameElement movingObject, int pos_x, int pos_y) {
         boolean isPositionValid = true;
 
