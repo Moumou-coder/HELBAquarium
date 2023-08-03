@@ -18,6 +18,7 @@ public class OrangeFish extends Fish {
         super.setPositions();
     }
 
+    /* cette méthode est vide, car le poisson orange n'a pas de comportement spécifique à lui par rapport aux autres poissons */
     @Override
     protected void fishBehaviour(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance, int range) {
     }

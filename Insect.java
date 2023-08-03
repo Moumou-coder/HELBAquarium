@@ -27,7 +27,8 @@ public class Insect extends FixedGameElement {
     public String getType(){
         return getPower() + "Insect";
     }
-    
+
+    /* En fonction du type d'insectes, cette méthode retourne la durée temporaire du bonus qui est l'augmentation de la vitesse du poisson */
     public int triggerAction(){
         if(getPower().equals("weak")) durationSpeed = 5000;
         if(getPower().equals("medium")) durationSpeed = 10000;
@@ -36,6 +37,8 @@ public class Insect extends FixedGameElement {
         return durationSpeed;
     }
 
+    /* Augmente temporairement à l'aide d'un Timer la vitesse du poisson lorsque celui-ci mange un type d'insecte.
+    * Le temps d'augmentation est déterminé par la durée d'action de l'insecte fourni par la méthode triggerAction. */
     @Override
     public void handleCollision(Fish fish, int void_x, int void_y){
         int speedFishIncreased = 14;
@@ -49,7 +52,6 @@ public class Insect extends FixedGameElement {
         });
         timer.start();
         fish.setSpeed(speedFishIncreased);
-
     }
 }
 

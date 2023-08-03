@@ -218,6 +218,8 @@ public class Board extends JPanel implements ActionListener {
         return isPositionValid;
     }
 
+    /* Cette méthode vérifie si un poisson rencontre un élément fixe pour ensuite le retirer du jeu après l'avoir mangé
+    * et déclenche une action en faisant appel à la méthode handleCollision de l'objet en question */
     private void checkFixedGameElementCollision() {
         int void_x = -1 * B_WIDTH;
         int void_y = -1 * B_HEIGHT;
@@ -231,6 +233,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+    /* Cette méthode arrête tous les poissons durant un certain délai à l'aide du timer sauf les types du poisson qu'on souhaite qu'il continue à nager */
     private void stopSpeedFishes(String fishType, int delay) {
         ArrayList<Fish> otherFish = (ArrayList<Fish>) fishList.stream().filter(fish -> !fish.getClass().getSimpleName().equals(fishType)).collect(Collectors.toList());
 
@@ -250,6 +253,8 @@ public class Board extends JPanel implements ActionListener {
         redFishEatsOtherFishes();
     }
 
+    /* Cette méthode récupère tous les poissons rouges dans une liste et tous les autres poissons dans une autre liste
+    * afin de vérifier si un poisson rouge rencontre un poisson d'une autre couleur, celui-ci le mange, ce qui a pour effet de le faire disparaitre de l'aquarium. */
     private void redFishEatsOtherFishes() {
         ArrayList<Fish> redFishes = (ArrayList<Fish>) fishList.stream().filter(fish -> fish instanceof RedFish).collect(Collectors.toList());
 
@@ -260,6 +265,9 @@ public class Board extends JPanel implements ActionListener {
         probabilityOfReproduction.removeIf(value -> !value);
     }
 
+    /* Cette méthode vérifie si deux poissons de la même espèce se croisent alors ils se reproduisent mais,
+    * le résultat de la reproduction dépend de la probabilité définie dans la liste probabilityOfReproduction.
+    * En fonction de la probabilité, soit il y a reproduction donc trois nouveaux poissons ou bien les deux poissons ont une nouvelle position aléatoire. */
     public void checkReproduction() {
         ArrayList<Fish> copyMovingList = new ArrayList<>(fishList);
 
@@ -307,6 +315,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+    /* cette méthode agit sur la vitesse des poissons, en fonction de la couleur de fond les poissons sont plus lents, normaux ou rapides */
     private void checkTemperature() {
         fishList.stream()
                 .filter(fish -> fish instanceof RedFish)
@@ -317,6 +326,9 @@ public class Board extends JPanel implements ActionListener {
         return (int) fishList.stream().filter(fish -> fish instanceof OrangeFish).count();
     }
 
+    /* Cette méthode est appelée lorsque l'utilisateur appuie sur des touches spécifiques.
+    * Une fois que le mode est activé, les poissons peuvent changer leur comportement en fonction de la cible spécifiée.
+    * Ceci s'applique à tous les poissons peu importe la couleur. */
     private static void triggerMode(String type) {
         for (Fish fish : fishList) {
             fish.setTargetType(type);
@@ -335,6 +347,8 @@ public class Board extends JPanel implements ActionListener {
         repaint();
     }
 
+    /* La classe TAdapter s'occupe du traitement des touches du clavier appuyé par l'utilisateur.
+    * Chaque touche est liée à une action spécifique qui déclenche certaines fonctionnalités. */
     private class TAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
