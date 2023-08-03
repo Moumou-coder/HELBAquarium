@@ -52,7 +52,6 @@ public class Board extends JPanel implements ActionListener {
         ImageIcon iip = new ImageIcon(Pellet.getPathToImage());
         fixedGameElementImageMap.put("Pellet", iip);
 
-
         /* HashMap reprenant le type de l'objet et le chemin des éléments mobiles du jeu (String) */
         ImageIcon iid = new ImageIcon(Decoration.getPathToImage());
         movingGameElementImageMap.put("Decoration", iid);
@@ -69,8 +68,8 @@ public class Board extends JPanel implements ActionListener {
         fishList = new ArrayList<>();
         probabilityOfReproduction = new ArrayList<>();
 
-        int insectCounter = 1;
-        int pelletCounter = 1;
+        int insectCounter = 4;
+        int pelletCounter = 4;
         int fishCounter = 4;
         final int DECO_AMOUNT = 4;
 
@@ -191,7 +190,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     /* Cette méthode vérifie la position des éléments mobiles dans le jeu afin d'assurer qu'ils sont bien dans le board
-    * ainsi que si un poisson rencontre une décoration afin qu'il ait une nouvelle direction aléatoire */
+     * ainsi que si un poisson rencontre une décoration afin qu'il ait une nouvelle direction aléatoire */
     public boolean isValidPosition(MovingGameElement movingObject, int pos_x, int pos_y) {
         boolean isPositionValid = true;
 
@@ -222,7 +221,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     /* Cette méthode vérifie si un poisson rencontre un élément fixe pour ensuite le retirer du jeu après l'avoir mangé
-    * et déclenche une action en faisant appel à la méthode handleCollision de l'objet en question */
+     * et déclenche une action en faisant appel à la méthode handleCollision de l'objet en question */
     private void checkFixedGameElementCollision() {
         int minusOne = -1;
         int void_x = minusOne * B_WIDTH;
@@ -231,7 +230,32 @@ public class Board extends JPanel implements ActionListener {
         for (FixedGameElement fixedElem : fixedGameElementList) {
             for (Fish fish : fishList) {
                 if ((fish.getPos_x() >= fixedElem.getPosX() - (DOT_SIZE) && fish.getPos_x() <= fixedElem.getPosX() + (DOT_SIZE)) && (fish.getPos_y() >= fixedElem.getPosY() - (DOT_SIZE) && fish.getPos_y() <= fixedElem.getPosY() + (DOT_SIZE))) {
-                    fixedElem.handleCollision(fish, void_x, void_y);
+
+                    /* Augmente temporairement à l'aide d'un Timer la vitesse du poisson lorsque celui-ci mange un type d'insecte.
+                     * Le temps d'augmentation est déterminé par la durée d'action de l'insecte fourni par la méthode triggerAction. */
+                    if (fixedElem instanceof Insect) {
+                        Timer timer = new Timer(((Insect) fixedElem).triggerAction(), actionEvent -> {
+                            Timer timerSpeed = (Timer) actionEvent.getSource();
+                            timerSpeed.stop();
+                            fish.setSpeed(Fish.INIT_SPEED);
+                        });
+                        timer.start();
+                        fish.setSpeed(fixedElem.handleCollision(void_x, void_y));
+                    }
+
+                    /* Lorsqu'un poisson mange une pilule, il ralentit sa vitesse en la divisant par trois
+                     * pendant un certain nombre de secondes équivalent au nombre de décorations présentes dans l'aquarium (handleCollision) */
+                    if (fixedElem instanceof Pellet) {
+                        int divider = 3;
+                        var timer = new Timer(fixedElem.handleCollision(void_x, void_y), e -> {
+                            Timer timerSpeed = (Timer) e.getSource();
+                            timerSpeed.stop();
+                            fish.setSpeed(Fish.INIT_SPEED);
+                        });
+
+                        timer.start();
+                        fish.setSpeed(fish.getSpeed() / divider);
+                    }
                 }
             }
         }
@@ -259,7 +283,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     /* Cette méthode récupère tous les poissons rouges dans une liste et tous les autres poissons dans une autre liste
-    * afin de vérifier si un poisson rouge rencontre un poisson d'une autre couleur, celui-ci le mange, ce qui a pour effet de le faire disparaitre de l'aquarium. */
+     * afin de vérifier si un poisson rouge rencontre un poisson d'une autre couleur, celui-ci le mange, ce qui a pour effet de le faire disparaitre de l'aquarium. */
     private void redFishEatsOtherFishes() {
         ArrayList<Fish> redFishes = (ArrayList<Fish>) fishList.stream().filter(fish -> fish instanceof RedFish).collect(Collectors.toList());
         int divider = 2;
@@ -272,8 +296,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     /* Cette méthode vérifie si deux poissons de la même espèce se croisent alors ils se reproduisent mais,
-    * le résultat de la reproduction dépend de la probabilité définie dans la liste probabilityOfReproduction.
-    * En fonction de la probabilité, soit il y a reproduction donc trois nouveaux poissons ou bien les deux poissons ont une nouvelle position aléatoire. */
+     * le résultat de la reproduction dépend de la probabilité définie dans la liste probabilityOfReproduction.
+     * En fonction de la probabilité, soit il y a reproduction donc trois nouveaux poissons ou bien les deux poissons ont une nouvelle position aléatoire. */
     public void checkReproduction() {
         ArrayList<Fish> copyMovingList = new ArrayList<>(fishList);
 
@@ -333,13 +357,38 @@ public class Board extends JPanel implements ActionListener {
                 .forEach(fish -> fish.setSpeed(getBackground() == Color.cyan ? (Fish.INIT_SPEED - speedVariation) : (getBackground() == Color.pink ? (Fish.INIT_SPEED + speedVariation) : (Fish.INIT_SPEED))));
     }
 
+    /* Fonctionnalité supplémentaire
+     *  Cette méthode met en arrêt tous les objets en mouvement et enlève tous les éléments fixes du jeu pendant une durée limitée telle la tombée de la nuit avant le levé du jour */
+    private void nightTime() {
+        int sleepTime = 0;
+        int tenSecond = 10000;
+        int newFixedElem = 3;
+
+        var timer = new Timer(tenSecond, e -> {
+            Timer timerSpeed = (Timer) e.getSource();
+            timerSpeed.stop();
+            setBackground(Color.lightGray);
+            fishList.forEach(f -> f.setSpeed(Fish.INIT_SPEED));
+            decorationList.forEach(d -> d.setSpeed(Decoration.INIT_SPEED));
+            for (int i = indexZero; i < newFixedElem; i++) {
+                createNewInsect();
+                createNewPellet();
+            }
+        });
+
+        timer.start();
+        fishList.forEach(f -> f.setSpeed(sleepTime));
+        decorationList.forEach(d -> d.setSpeed(sleepTime));
+        fixedGameElementList.clear();
+    }
+
     public static int amountOfOrangeFish() {
         return (int) fishList.stream().filter(fish -> fish instanceof OrangeFish).count();
     }
 
     /* Cette méthode est appelée lorsque l'utilisateur appuie sur des touches spécifiques.
-    * Une fois que le mode est activé, les poissons peuvent changer leur comportement en fonction de la cible spécifiée.
-    * Ceci s'applique à tous les poissons peu importe la couleur. */
+     * Une fois que le mode est activé, les poissons peuvent changer leur comportement en fonction de la cible spécifiée.
+     * Ceci s'applique à tous les poissons peu importe la couleur. */
     private static void triggerMode(String type) {
         for (Fish fish : fishList) {
             fish.setTargetType(type);
@@ -359,7 +408,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     /* La classe TAdapter s'occupe du traitement des touches du clavier appuyé par l'utilisateur.
-    * Chaque touche est liée à une action spécifique qui déclenche certaines fonctionnalités. */
+     * Chaque touche est liée à une action spécifique qui déclenche certaines fonctionnalités. */
     private class TAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
@@ -378,6 +427,10 @@ public class Board extends JPanel implements ActionListener {
             if (key == KeyEvent.VK_NUMPAD2) {
                 setBackground(Color.lightGray);
                 checkTemperature();
+            }
+            if (key == KeyEvent.VK_N) {
+                setBackground(Color.darkGray);
+                nightTime();
             }
             if (key == KeyEvent.VK_NUMPAD3) {
                 setBackground(Color.pink);

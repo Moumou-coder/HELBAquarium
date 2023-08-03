@@ -4,7 +4,7 @@ import java.util.Collections;
 public abstract class Fish extends MovingGameElement {
     private static final String[] PANEL_COLOR = {"Orange", "Red", "Blue", "Purple"};
     protected int index;
-    protected final int RANGE_DISTANCE = 900;
+    protected final int RANGE_DISTANCE = 300;
     private String targetType;
     private boolean isModeActivated = false;
 
@@ -42,8 +42,8 @@ public abstract class Fish extends MovingGameElement {
     }
 
     /* Initialise le comportement des classes filles.
-    * Cette méthode calcule les positions possibles autour du poisson et détermine les distances entre ces positions et la position cible.
-    * L'indice (index) de la distance minimale dans la liste des distances est également calculé pour déterminer le mouvement du poisson pour aller vers sa cible.*/
+     * Cette méthode calcule les positions possibles autour du poisson et détermine les distances entre ces positions et la position cible.
+     * L'indice (index) de la distance minimale dans la liste des distances est également calculé pour déterminer le mouvement du poisson pour aller vers sa cible.*/
     protected void initFishBehaviour(Board board) {
         setX_moveOptions(new ArrayList<Integer>());
         setY_moveOptions(new ArrayList<Integer>());
@@ -68,7 +68,7 @@ public abstract class Fish extends MovingGameElement {
     }
 
     /* Mode de reproduction du poisson, calcule la trajectoire du mouvement du poisson en fonction des autres poissons du même type (mvElemOther).
-    * Exemple : les poissons rouges vont se chercher mutuellement pour ser reproduire */
+     * Exemple : les poissons rouges vont se chercher mutuellement pour ser reproduire */
     protected void reproductionMode(Board board, MovingGameElement mvElemOther, ArrayList<Integer> tempoX, ArrayList<Integer> tempoY, ArrayList<Double> tempoDistance) {
         calculPossibilities(board, tempoX, tempoY);
         calculDistance(tempoDistance, tempoX, tempoY, mvElemOther.getPos_x(), mvElemOther.getPos_y());
