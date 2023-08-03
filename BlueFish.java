@@ -17,7 +17,7 @@ public class BlueFish extends Fish {
             ArrayList<Double> tempoDistance = new ArrayList<Double>();
 
             /* Les poissons bleus se déplacent toujours dans la direction du poisson bleu ou mauve le plus proche.
-            * Dans le cas contraire où il n'y a aucun poisson bleu ou mauve autour de lui (RANGE_DISTANCE), il continue de nager en gardant le même comportement que les poissons orange */
+             * Dans le cas contraire où il n'y a aucun poisson bleu ou mauve autour de lui (RANGE_DISTANCE), il continue de nager en gardant le même comportement que les poissons orange */
             if (this != mvElemOther && (mvElemOther.getClass().getSimpleName().equals("BlueFish") || mvElemOther.getClass().getSimpleName().equals("PurpleFish"))) {
                 fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, RANGE_DISTANCE);
             }
