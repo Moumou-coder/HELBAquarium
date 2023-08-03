@@ -23,6 +23,8 @@ public class Board extends JPanel implements ActionListener {
     public static ArrayList<Decoration> decorationList;
     public static ArrayList<Fish> fishList;
     private ArrayList<Boolean> probabilityOfReproduction;
+    private final int indexZero = 0;
+    private final int indexOne = 1;
 
     public Board() {
         initBoard();
@@ -73,18 +75,18 @@ public class Board extends JPanel implements ActionListener {
         final int DECO_AMOUNT = 4;
 
         /* Création des objets éléments fixes du jeu en fonction du nombre d'objets qu'on souhaite affiche (initialisé juste dessus) */
-        for (int i = 0; i < insectCounter; i++) {
+        for (int i = indexZero; i < insectCounter; i++) {
             createNewInsect();
         }
-        for (int i = 0; i < pelletCounter; i++) {
+        for (int i = indexZero; i < pelletCounter; i++) {
             createNewPellet();
         }
 
         /* Création des objets éléments mobiles du jeu */
-        for (int i = 0; i < DECO_AMOUNT; i++) {
+        for (int i = indexZero; i < DECO_AMOUNT; i++) {
             createNewDecoration();
         }
-        for (int i = 0; i < fishCounter; i++) {
+        for (int i = indexZero; i < fishCounter; i++) {
             createNewFish();
         }
 
@@ -111,13 +113,13 @@ public class Board extends JPanel implements ActionListener {
         int[] TargetArraySides = getRandomPositionSidesBoard();
         Fish fish = null;
         if (colorChoice.equals("Orange"))
-            fish = new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]);
+            fish = new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[indexZero], TargetArraySides[indexOne]);
         if (colorChoice.equals("Blue"))
-            fish = new BlueFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]);
+            fish = new BlueFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[indexZero], TargetArraySides[indexOne]);
         if (colorChoice.equals("Purple"))
-            fish = new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]);
+            fish = new PurpleFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[indexZero], TargetArraySides[indexOne]);
         if (colorChoice.equals("Red"))
-            fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]);
+            fish = new RedFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[indexZero], TargetArraySides[indexOne]);
 
         fishList.add(fish);
         probabilityOfReproduction.add(true);
@@ -179,8 +181,8 @@ public class Board extends JPanel implements ActionListener {
     /* méthode définissant une cible aléatoire pour les poissons au sein du board */
     public void changeTargets(Fish fish) {
         int[] randTarget = getRandomPositionSidesBoard();
-        fish.setTarget_x(randTarget[0]);
-        fish.setTarget_y(randTarget[1]);
+        fish.setTarget_x(randTarget[indexZero]);
+        fish.setTarget_y(randTarget[indexOne]);
     }
 
     private void move() {
@@ -193,6 +195,7 @@ public class Board extends JPanel implements ActionListener {
     public boolean isValidPosition(MovingGameElement movingObject, int pos_x, int pos_y) {
         boolean isPositionValid = true;
 
+        // 0 = (B_WIDTH - B_WIDTH) OU (B_HEIGHT - B_HEIGHT) => IntelliJIDEA me demande de changer si je ne met pas le 0.
         if (movingObject instanceof Decoration) {
             if (pos_y < 0 || pos_y >= (B_HEIGHT - DECO_HEIGHT)) {
                 isPositionValid = false;
@@ -221,8 +224,9 @@ public class Board extends JPanel implements ActionListener {
     /* Cette méthode vérifie si un poisson rencontre un élément fixe pour ensuite le retirer du jeu après l'avoir mangé
     * et déclenche une action en faisant appel à la méthode handleCollision de l'objet en question */
     private void checkFixedGameElementCollision() {
-        int void_x = -1 * B_WIDTH;
-        int void_y = -1 * B_HEIGHT;
+        int minusOne = -1;
+        int void_x = minusOne * B_WIDTH;
+        int void_y = minusOne * B_HEIGHT;
 
         for (FixedGameElement fixedElem : fixedGameElementList) {
             for (Fish fish : fishList) {
@@ -236,6 +240,7 @@ public class Board extends JPanel implements ActionListener {
     /* Cette méthode arrête tous les poissons durant un certain délai à l'aide du timer sauf les types du poisson qu'on souhaite qu'il continue à nager */
     private void stopSpeedFishes(String fishType, int delay) {
         ArrayList<Fish> otherFish = (ArrayList<Fish>) fishList.stream().filter(fish -> !fish.getClass().getSimpleName().equals(fishType)).collect(Collectors.toList());
+        int speedNull = 0;
 
         var timer = new Timer(delay, e -> {
             Timer timerSpeed = (Timer) e.getSource();
@@ -244,7 +249,7 @@ public class Board extends JPanel implements ActionListener {
         });
 
         timer.start();
-        otherFish.forEach(fish -> fish.setSpeed(0));
+        otherFish.forEach(fish -> fish.setSpeed(speedNull));
         fishList.stream().filter(fish -> fish.getClass().getSimpleName().equals(fishType)).forEach(fish -> fish.setSpeed(Fish.INIT_SPEED));
     }
 
@@ -257,10 +262,11 @@ public class Board extends JPanel implements ActionListener {
     * afin de vérifier si un poisson rouge rencontre un poisson d'une autre couleur, celui-ci le mange, ce qui a pour effet de le faire disparaitre de l'aquarium. */
     private void redFishEatsOtherFishes() {
         ArrayList<Fish> redFishes = (ArrayList<Fish>) fishList.stream().filter(fish -> fish instanceof RedFish).collect(Collectors.toList());
+        int divider = 2;
 
         fishList.removeIf(fishOther -> {
             if (fishOther instanceof RedFish) return false;
-            return redFishes.stream().anyMatch(fishRed -> (fishOther.getPos_x() >= fishRed.getPos_x() - (DOT_SIZE / 2) && fishOther.getPos_x() <= fishRed.getPos_x() + (DOT_SIZE / 2)) && (fishOther.getPos_y() >= fishRed.getPos_y() - (DOT_SIZE / 2) && fishOther.getPos_y() <= fishRed.getPos_y() + (DOT_SIZE / 2)));
+            return redFishes.stream().anyMatch(fishRed -> (fishOther.getPos_x() >= fishRed.getPos_x() - (DOT_SIZE / divider) && fishOther.getPos_x() <= fishRed.getPos_x() + (DOT_SIZE / divider)) && (fishOther.getPos_y() >= fishRed.getPos_y() - (DOT_SIZE / divider) && fishOther.getPos_y() <= fishRed.getPos_y() + (DOT_SIZE / divider)));
         });
         probabilityOfReproduction.removeIf(value -> !value);
     }
@@ -272,11 +278,15 @@ public class Board extends JPanel implements ActionListener {
         ArrayList<Fish> copyMovingList = new ArrayList<>(fishList);
 
         int count = 0;
+        int divider = 2;
+        int moduloZero = 0;
+        int minIndex = 0;
+        int maxIndex = 3;
         for (Fish fish : copyMovingList) {
             for (Fish secondFish : copyMovingList) {
                 if ((fish.getClass().getSimpleName().equals(secondFish.getClass().getSimpleName())) &&
                         (fish != secondFish) &&
-                        (secondFish.getPos_x() >= fish.getPos_x() - (DOT_SIZE / 2) && secondFish.getPos_x() <= fish.getPos_x() + (DOT_SIZE / 2)) && (secondFish.getPos_y() >= fish.getPos_y() - (DOT_SIZE / 2) && secondFish.getPos_y() <= fish.getPos_y() + (DOT_SIZE / 2))) {
+                        (secondFish.getPos_x() >= fish.getPos_x() - (DOT_SIZE / divider) && secondFish.getPos_x() <= fish.getPos_x() + (DOT_SIZE / divider)) && (secondFish.getPos_y() >= fish.getPos_y() - (DOT_SIZE / divider) && secondFish.getPos_y() <= fish.getPos_y() + (DOT_SIZE / divider))) {
 
                     int sizeOfList = probabilityOfReproduction.size();
                     int randomValueOfReproductionList = (int) (Math.random() * sizeOfList);
@@ -287,8 +297,8 @@ public class Board extends JPanel implements ActionListener {
                         fishList.remove(secondFish);
 
                         count++;
-                        if (count % 2 == 0) {
-                            for (int i = 0; i < 3; i++) {
+                        if (count % divider == moduloZero) {
+                            for (int i = minIndex; i < maxIndex; i++) {
                                 int[] TargetArraySides = getRandomPositionSidesBoard();
                                 if (fish instanceof OrangeFish)
                                     fishList.add(new OrangeFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]));
@@ -299,7 +309,7 @@ public class Board extends JPanel implements ActionListener {
                                 if (fish instanceof RedFish)
                                     fishList.add(new RedFish(getRandomCoordinate(), getRandomCoordinate(), TargetArraySides[0], TargetArraySides[1]));
 
-                                for (int probability = 0; probability < Fish.getPANEL_COLOR().length; probability++)
+                                for (int probability = minIndex; probability < Fish.getPANEL_COLOR().length; probability++)
                                     probabilityOfReproduction.add(false);
                             }
                         }
@@ -317,9 +327,10 @@ public class Board extends JPanel implements ActionListener {
 
     /* cette méthode agit sur la vitesse des poissons, en fonction de la couleur de fond les poissons sont plus lents, normaux ou rapides */
     private void checkTemperature() {
+        int speedVariation = 3;
         fishList.stream()
                 .filter(fish -> fish instanceof RedFish)
-                .forEach(fish -> fish.setSpeed(getBackground() == Color.cyan ? (Fish.INIT_SPEED - 3) : (getBackground() == Color.pink ? (Fish.INIT_SPEED + 3) : (Fish.INIT_SPEED))));
+                .forEach(fish -> fish.setSpeed(getBackground() == Color.cyan ? (Fish.INIT_SPEED - speedVariation) : (getBackground() == Color.pink ? (Fish.INIT_SPEED + speedVariation) : (Fish.INIT_SPEED))));
     }
 
     public static int amountOfOrangeFish() {
