@@ -14,6 +14,9 @@ public class Pellet extends FixedGameElement {
         return "Pellet";
     }
 
+    /* Lorsqu'un poisson mange une pilule, il ralentit sa vitesse en la divisant par trois
+    pendant un certain nombre de secondes équivalent au nombre de décorations présentes dans l'aquarium.
+    Cette méthode va faire disparaitre la pilule comestible et donner le délai durant lequel le poisson sera plus lent */
     @Override
     public void handleCollision(Fish fish, int void_x, int void_y) {
         int oneSecond = 1000;
@@ -23,6 +26,7 @@ public class Pellet extends FixedGameElement {
         slowFishSpeed(fish, delaySlowFish);
     }
 
+    /* Cette méthode met à jour la vitesse du poisson et le ralentit temporairement. */
     private void slowFishSpeed (Fish fish, int delay){
         int divider = 3;
         var timer = new Timer(delay, e -> {

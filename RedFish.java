@@ -15,6 +15,8 @@ public class RedFish extends Fish {
             ArrayList<Integer> tempoY = new ArrayList<Integer>();
             ArrayList<Double> tempoDistance = new ArrayList<Double>();
 
+            /* Les poissons rouges se déplacent toujours dans la direction du poisson, non rouge, le plus proche.
+             * Dans le cas contraire où il n'y a aucun poisson non rouge autour de lui (RANGE_DISTANCE), il continue de nager en gardant le même comportement que les poissons orange */
             if (!mvElemOther.getClass().getSimpleName().equals("RedFish")) {
                 fishBehaviour(board, mvElemOther, tempoX, tempoY, tempoDistance, RANGE_DISTANCE);
             }
