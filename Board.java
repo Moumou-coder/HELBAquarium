@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class Board extends JPanel implements ActionListener {
 
     private final int B_WIDTH = 600;
-    private final int B_HEIGHT = 600;
+    private final int B_HEIGHT = 700;
     private final int DOT_SIZE = 10;
     private boolean inGame = true;
     private final int DECO_WIDTH = 30;
@@ -428,13 +428,14 @@ public class Board extends JPanel implements ActionListener {
                 setBackground(Color.lightGray);
                 checkTemperature();
             }
-            if (key == KeyEvent.VK_N) {
-                setBackground(Color.darkGray);
-                nightTime();
-            }
             if (key == KeyEvent.VK_NUMPAD3) {
                 setBackground(Color.pink);
                 checkTemperature();
+            }
+            /* Fonctionnalité supplémentaire */
+            if (key == KeyEvent.VK_N) {
+                setBackground(Color.darkGray);
+                nightTime();
             }
             if (key == KeyEvent.VK_NUMPAD4)
                 createNewInsect();
